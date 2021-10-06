@@ -65,7 +65,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Label x:Name="LoadedMidiLabel" Content="Loaded MIDI: " HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Padding="0,0,0,0"/>
-            <TextBox x:Name="LoadedMidiTextBox" Text="&lt;Reall long File Name&gt;" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.ColumnSpan="3" VerticalContentAlignment="Center">
+            <TextBox x:Name="LoadedMidiTextBox" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.ColumnSpan="3" VerticalContentAlignment="Center">
                 <TextBox.Style>
                     <Style TargetType="TextBox">
                         <Setter Property="IsReadOnly" Value="True" />
@@ -75,7 +75,7 @@
                 </TextBox.Style>
             </TextBox>
             <Label x:Name="LoadedBankLabel" Content="Loaded Bank: " HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" Padding="0,0,0,0"/>
-            <TextBox x:Name="LoadedBankTextBox" Text="&lt;Reall long Bank Name&gt;" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.ColumnSpan="3" Grid.Row="1" VerticalContentAlignment="Center">
+            <TextBox x:Name="LoadedBankTextBox" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.ColumnSpan="3" Grid.Row="1" VerticalContentAlignment="Center">
                 <TextBox.Style>
                     <Style TargetType="TextBox">
                         <Setter Property="IsReadOnly" Value="True" />
@@ -89,7 +89,7 @@
             <Label x:Name="TickMulLabel" Content="Tick Multiplier: " HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="4" Padding="0,0,0,0"/>
             <TextBox x:Name="TickMulTextBox" Grid.Row="4" Grid.Column="1" Margin="5,5,5,5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
 
-            <Label Content="MIDI" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,0,0,0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" />
+            <Label Content="MIDI Resolution: " Grid.Row="3" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,0,0,0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" />
             <TextBox x:Name="MidiNumber" Text="420" Grid.Column="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="3" HorizontalContentAlignment="Right" VerticalContentAlignment="Center">
                 <TextBox.Style>
                     <Style TargetType="TextBox">

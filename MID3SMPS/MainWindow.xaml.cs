@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using MahApps.Metro.Controls;
+using Microsoft.Win32;
+using MID3SMPS.Containers;
 
 namespace MID3SMPS{
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	public partial class MainWindow : MetroWindow{
-		private const string DACPath =
-			@"00_BassDrum.raw";
+		public Mappings Mappings;
 		public MainWindow(){
 			InitializeComponent();
-			DebuggingStuff();
+			//DebuggingStuff();
 		}
 
 		private void DebuggingStuff(){
@@ -48,6 +50,7 @@ namespace MID3SMPS{
 			OpnDll.OPN_Write(0x0, 0xB4, 0x00 | 0xC0);
 			OpnDll.OPN_Write(0, 0x28, 0xF0);
 
+			//const string DACPath = @"00_BassDrum.raw";
 			//byte[] sampleData =
 			//	File.ReadAllBytes(DACPath);
 			//OpnDll.SetDACFrequency(0, 15625);
@@ -75,7 +78,22 @@ namespace MID3SMPS{
 		private void QuickConvertCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
 		private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 		private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
-		private void OpenMappingsCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
+		private void OpenMappingsCommand_Executed(object sender, ExecutedRoutedEventArgs e){
+			OpenFileDialog fileDialog = new(){
+				AddExtension = true,
+				CheckFileExists = true,
+				CheckPathExists = true,
+				Filter = "Configuration files (*.cfg)|*.cfg",
+				DefaultExt = "cfg"
+			};
+			if(fileDialog.ShowDialog() == true){
+				Mappings = new Mappings(new FileInfo(fileDialog.FileName));
+			}
+
+			LoadedBankTextBox.Text = Mappings.gybPath.Name;
+			LoadedBankTextBox.ToolTip = Mappings.gybPath.FullName;
+			Status.Text = "Configuration Loaded";
+		}
 		private void SaveMappingsCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 		private void OpenInstrumentEditorCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 		private void OpenMappingsEditorCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
