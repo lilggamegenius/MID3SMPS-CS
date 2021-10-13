@@ -28,6 +28,7 @@ namespace MID3SMPS.Containers.Gyb{
 		private static GYB LoadV3(GYB gyb, byte[] gybData){
 			gyb.defaultLFOSpeed = (sbyte)gybData[3];
 			uint filesize = BitConverter.ToUInt32(gybData, 0x4);
+			if(filesize != gybData.Length) throw new FormatException("Not a valid GYB formatted file");
 			uint bankOffset = BitConverter.ToUInt32(gybData, 0x8);
 			uint mapsOffset = BitConverter.ToUInt32(gybData, 0xC);
 			return gyb;
@@ -61,20 +62,14 @@ EOF
 Instrument Data [v1]
 ---------------
 00	1D	YM2612 Registers
-		Order:	30 34 38 3C 40 44 48 4C
-			50 54 58 5C 60 64 68 6C
-			70 74 78 7C 80 84 88 8C
-			90 94 98 9C B0
+		Order:	30 34 38 3C 40 44 48 4C 50 54 58 5C 60 64 68 6C 70 74 78 7C 80 84 88 8C 90 94 98 9C B0
 1D	01	Instrument Transposition (signed 8-bit)
 		Drum Bank: default drum note (unsigned 8-bit)
 
 Instrument Data [v2]
 ---------------
 00	1E	YM2612 Registers
-		Order:	30 34 38 3C 40 44 48 4C
-			50 54 58 5C 60 64 68 6C
-			70 74 78 7C 80 84 88 8C
-			90 94 98 9C B0 B4
+		Order:	30 34 38 3C 40 44 48 4C 50 54 58 5C 60 64 68 6C 70 74 78 7C 80 84 88 8C 90 94 98 9C B0 B4
 1E	01	Instrument Transposition (same as v1)
 1F	01	Padding (set to 0)
 
@@ -109,10 +104,7 @@ Instrument Data
 ---------------
 00	02	Bytes used by this instrument (includes this value)
 02	1E	YM2612 Registers
-		Order:	30 34 38 3C 40 44 48 4C
-			50 54 58 5C 60 64 68 6C
-			70 74 78 7C 80 84 88 8C
-			90 94 98 9C B0 B4
+		Order:	30 34 38 3C 40 44 48 4C 50 54 58 5C 60 64 68 6C 70 74 78 7C 80 84 88 8C 90 94 98 9C B0 B4
 20	01	Instrument Transposition (signed 8-bit)
 		Drum Bank: default drum note (unsigned 8-bit)
 21	01	Bitfield: Additional Data

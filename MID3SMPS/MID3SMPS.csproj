@@ -4,7 +4,7 @@
         <OutputType>WinExe</OutputType>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
-        <TargetFramework>net5.0-windows</TargetFramework>
+        <TargetFramework>net5.0-windows7.0</TargetFramework>
         <LangVersion>10</LangVersion>
     </PropertyGroup>
 
@@ -17,6 +17,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Update="MainSettings.Designer.cs">
+            <DesignTimeSharedInput>True</DesignTimeSharedInput>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>MainSettings.settings</DependentUpon>
+        </Compile>
         <Compile Update="WindowCommands.cs">
             <DependentUpon>MainWindow.xaml</DependentUpon>
         </Compile>
@@ -31,6 +36,13 @@
         <Resource Include="OPN_DLL.dll">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Resource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="MainSettings.settings">
+            <Generator>SettingsSingleFileGenerator</Generator>
+            <LastGenOutput>MainSettings.Designer.cs</LastGenOutput>
+        </None>
     </ItemGroup>
 
 </Project>

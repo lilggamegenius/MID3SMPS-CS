@@ -44,7 +44,6 @@ namespace MID3SMPS{
 																	 new InputGestureCollection{
 																		 new KeyGesture(Key.T, ModifierKeys.Control)
 																	 });
-		public static readonly RoutedUICommand ConvertSongTitle = new("Convert Song _Title", "ConvertSongTitle", typeof(WindowCommands));
 		public static readonly RoutedUICommand LoadInsLib = new("Load Ins _Lib",
 																"LoadInsLib",
 																typeof(WindowCommands),

@@ -1,6 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MID3SMPS", "MID3SMPS\MID3SMPS.csproj", "{22E4EB86-002E-4287-93B8-D1F22FC8CC3B}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31612.314
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MID3SMPS", "MID3SMPS\MID3SMPS.csproj", "{22E4EB86-002E-4287-93B8-D1F22FC8CC3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +15,11 @@ Global
 		{22E4EB86-002E-4287-93B8-D1F22FC8CC3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22E4EB86-002E-4287-93B8-D1F22FC8CC3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22E4EB86-002E-4287-93B8-D1F22FC8CC3B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {62A25CF0-7AAF-4910-BA7C-DA93781D2427}
 	EndGlobalSection
 EndGlobal

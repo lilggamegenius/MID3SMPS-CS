@@ -6,7 +6,9 @@
                  xmlns:local="clr-namespace:MID3SMPS"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  mc:Ignorable="d"
-                 Title="MID --> SMPS" Height="260" Width="320" SizeToContent="WidthAndHeight">
+                 Closing="OnClosing"
+                 Loaded="MainWindowLoaded"
+                 Title="MID --> SMPS" Height="320" Width="320" SizeToContent="WidthAndHeight">
     <Window.CommandBindings>
         <CommandBinding Command="local:WindowCommands.OpenMidi" CanExecute="OpenCommand_CanExecute" Executed="OpenCommand_Executed" />
         <CommandBinding Command="local:WindowCommands.SaveSmps" CanExecute="SaveCommand_CanExecute" Executed="SaveCommand_Executed" />
@@ -15,7 +17,6 @@
         <CommandBinding Command="local:WindowCommands.OpenInstrumentEditor" CanExecute="OpenInstrumentEditorCommand_CanExecute" Executed="OpenInstrumentEditorCommand_Executed" />
         <CommandBinding Command="local:WindowCommands.OpenMappingsEditor" CanExecute="OpenMappingsEditorCommand_CanExecute" Executed="OpenMappingsEditorCommand_Executed" />
         <CommandBinding Command="local:WindowCommands.TempoCalculator" CanExecute="TempoCalculatorCommand_CanExecute" Executed="TempoCalculatorCommand_Executed" />
-        <CommandBinding Command="local:WindowCommands.ConvertSongTitle" CanExecute="ConvertSongTitleCommand_CanExecute" Executed="ConvertSongTitleCommand_Executed" />
         <CommandBinding Command="local:WindowCommands.LoadInsLib" CanExecute="LoadInsLibCommand_CanExecute" Executed="LoadInsLibCommand_Executed" />
         <CommandBinding Command="local:WindowCommands.QuickConvert" CanExecute="QuickConvertCommand_CanExecute" Executed="QuickConvertCommand_Executed" />
     </Window.CommandBindings>
@@ -36,7 +37,7 @@
             </MenuItem>
             <MenuItem x:Name="ExtrasMenuItem" Header="_Extras">
                 <MenuItem x:Name="TempoCalculatorItem" Command="local:WindowCommands.TempoCalculator"/>
-                <MenuItem x:Name="ConvertSongTitleItem" Command="local:WindowCommands.ConvertSongTitle"/>
+                <MenuItem x:Name="ConvertSongTitleItem" Header="Convert Song _Title" IsCheckable="true" IsChecked="False" Checked="Unimplemented_Checked" Unchecked="Unimplemented_Unchecked"/>
                 <MenuItem x:Name="S2RModeItem" Header="S2_R Mode" IsCheckable="true" IsChecked="False" Checked="Unimplemented_Checked" Unchecked="Unimplemented_Unchecked"/>
                 <MenuItem x:Name="PwmModeItem" Header="P_WM Mode" IsCheckable="true" IsChecked="False" Checked="Unimplemented_Checked" Unchecked="Unimplemented_Unchecked"/>
                 <MenuItem x:Name="PerFileInstrumentsItem" Header="_Per File Instruments" IsCheckable="true" IsChecked="False" Checked="Unimplemented_Checked" Unchecked="Unimplemented_Unchecked"/>

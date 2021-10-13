@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -58,6 +59,14 @@ namespace MID3SMPS{
 			//OpnDll.PlayDACSample(0, (uint)sampleData.Length, sampleData, 0);
 		}
 
+		private void Load(FileInfo path){
+			Mappings = new Mappings(path);
+			LoadedBankTextBox.Text = Mappings.gybPath.Name;
+			LoadedBankTextBox.ToolTip = Mappings.gybPath.FullName;
+			Status.Text = "Configuration Loaded";
+			MainSettings.Default.LastMappingFile = Mappings.path.FullName;
+		}
+
 		private void Unimplemented(object sender, EventArgs e){
 			MessageBox.Show("Sorry, That action hasn't been implemented yet",
 							"Unimplemented Action",
@@ -73,7 +82,6 @@ namespace MID3SMPS{
 		private void OpenInstrumentEditorCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
 		private void OpenMappingsEditorCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
 		private void TempoCalculatorCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
-		private void ConvertSongTitleCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
 		private void LoadInsLibCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
 		private void QuickConvertCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
 		private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
@@ -86,20 +94,24 @@ namespace MID3SMPS{
 				Filter = "Configuration files (*.cfg)|*.cfg",
 				DefaultExt = "cfg"
 			};
-			if(fileDialog.ShowDialog() == true){
-				Mappings = new Mappings(new FileInfo(fileDialog.FileName));
-			}
-
-			LoadedBankTextBox.Text = Mappings.gybPath.Name;
-			LoadedBankTextBox.ToolTip = Mappings.gybPath.FullName;
-			Status.Text = "Configuration Loaded";
+			if(fileDialog.ShowDialog() != true) return;
+			Load(new FileInfo(fileDialog.FileName));
 		}
 		private void SaveMappingsCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 		private void OpenInstrumentEditorCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 		private void OpenMappingsEditorCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 		private void TempoCalculatorCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
-		private void ConvertSongTitleCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 		private void LoadInsLibCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 		private void QuickConvertCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
+		private void OnClosing(object sender, CancelEventArgs e){MainSettings.Default.Save();}
+		private void MainWindowLoaded(object sender, RoutedEventArgs e){
+			if(string.IsNullOrWhiteSpace(MainSettings.Default.LastMappingFile)) return;
+			Load(new FileInfo(MainSettings.Default.LastMappingFile));
+			ConvertSongTitleItem.IsChecked = MainSettings.Default.ConvertSongTitle;
+			S2RModeItem.IsChecked = MainSettings.Default.S2RMode;
+			PwmModeItem.IsChecked = MainSettings.Default.PwmMode;
+			PerFileInstrumentsItem.IsChecked = MainSettings.Default.PerFileInstruments;
+			AutoReloadMidiItem.IsChecked = MainSettings.Default.AutoReloadMidi;
+		}
 	}
 }
