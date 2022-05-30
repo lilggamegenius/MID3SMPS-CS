@@ -4,16 +4,21 @@
         <OutputType>WinExe</OutputType>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
-        <TargetFramework>net5.0-windows7.0</TargetFramework>
-        <LangVersion>10</LangVersion>
+        <TargetFramework>net5.0-windows</TargetFramework>
+        <LangVersion>latestmajor</LangVersion>
+        <ApplicationIcon>Resources\Icons\mid3smps.ico</ApplicationIcon>
+        <PlatformTarget>x64</PlatformTarget>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <PlatformTarget>x86</PlatformTarget>
+        <PlatformTarget>x64</PlatformTarget>
+        <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <PlatformTarget>x86</PlatformTarget>
+        <PlatformTarget>x64</PlatformTarget>
+        <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -33,9 +38,6 @@
 
     <ItemGroup>
         <None Remove="OPN_DLL.dll"/>
-        <Resource Include="OPN_DLL.dll">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Resource>
     </ItemGroup>
 
     <ItemGroup>
@@ -43,6 +45,24 @@
             <Generator>SettingsSingleFileGenerator</Generator>
             <LastGenOutput>MainSettings.Designer.cs</LastGenOutput>
         </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Native\x64"/>
+        <Folder Include="Native\x86"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="Resources\Icons\2612edit mono.ico"/>
+        <Resource Include="Resources\Icons\2612edit mono.ico"/>
+        <None Remove="Resources\Icons\mid3smps mono.ico"/>
+        <Resource Include="Resources\Icons\mid3smps mono.ico"/>
+        <None Remove="Resources\Icons\mid3smps.ico"/>
+        <Resource Include="Resources\Icons\mid3smps.ico"/>
+        <None Remove="Resources\Icons\2612edit.ico"/>
+        <Resource Include="Resources\Icons\2612edit.ico"/>
+        <None Remove="Resources\Icons\2612edit transparent.ico"/>
+        <Resource Include="Resources\Icons\2612edit transparent.ico"/>
     </ItemGroup>
 
 </Project>

@@ -4,59 +4,60 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
-using MahApps.Metro.Controls;
 using Microsoft.Win32;
 using MID3SMPS.Containers;
+using MID3SMPS.Forms;
 
 namespace MID3SMPS{
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
-	public partial class MainWindow : MetroWindow{
+	public partial class MainWindow{
+		public Ym2612Edit? EditWindow;
 		public Mappings Mappings;
+
 		public MainWindow(){
 			InitializeComponent();
-			//DebuggingStuff();
+			//DebuggingStuff(); // Todo: Fix OPN_DLL PInvoke
 		}
 
 		private void DebuggingStuff(){
 			byte ret = OpnDll.OpenOPNDriver(1);
 			Debug.WriteLine($"ChipOpen = 0x{ret:X2}");
-			OpnDll.OPN_Write(0, 0x2B, 0x80);
-			OpnDll.OPN_Write(0x0, 0x30, 0x32);
-			OpnDll.OPN_Write(0x0, 0x34, 0x00);
-			OpnDll.OPN_Write(0x0, 0x38, 0x00);
-			OpnDll.OPN_Write(0x0, 0x3C, 0x03);
-			OpnDll.OPN_Write(0x0, 0x40, 0x11);
-			OpnDll.OPN_Write(0x0, 0x44, 0x18);
-			OpnDll.OPN_Write(0x0, 0x48, 0x1B);
-			OpnDll.OPN_Write(0x0, 0x4C, 0x11);
-			OpnDll.OPN_Write(0x0, 0x50, 0x1F);
-			OpnDll.OPN_Write(0x0, 0x54, 0x1F);
-			OpnDll.OPN_Write(0x0, 0x58, 0x1F);
-			OpnDll.OPN_Write(0x0, 0x5C, 0x1F);
-			OpnDll.OPN_Write(0x0, 0x60, 0x06);
-			OpnDll.OPN_Write(0x0, 0x64, 0x07);
-			OpnDll.OPN_Write(0x0, 0x68, 0x09);
-			OpnDll.OPN_Write(0x0, 0x6C, 0x03);
-			OpnDll.OPN_Write(0x0, 0x70, 0x00);
-			OpnDll.OPN_Write(0x0, 0x74, 0x00);
-			OpnDll.OPN_Write(0x0, 0x78, 0x00);
-			OpnDll.OPN_Write(0x0, 0x7C, 0x00);
-			OpnDll.OPN_Write(0x0, 0x80, 0x17);
-			OpnDll.OPN_Write(0x0, 0x84, 0x16);
-			OpnDll.OPN_Write(0x0, 0x88, 0x15);
-			OpnDll.OPN_Write(0x0, 0x8C, 0x13);
-			OpnDll.OPN_Write(0x0, 0xB0, 0x38);
-			OpnDll.OPN_Write(0x0, 0xB4, 0x00 | 0xC0);
-			OpnDll.OPN_Write(0, 0x28, 0xF0);
-
-			//const string DACPath = @"00_BassDrum.raw";
-			//byte[] sampleData =
-			//	File.ReadAllBytes(DACPath);
-			//OpnDll.SetDACFrequency(0, 15625);
-			//OpnDll.SetDACVolume(0, 0x100/2); // 0x100 = 100%
-			//OpnDll.PlayDACSample(0, (uint)sampleData.Length, sampleData, 0);
+			//OpnDll.OPN_Write(0, 0x2B, 0x80);
+			//OpnDll.OPN_Write(0x0, 0x30, 0x32);
+			//OpnDll.OPN_Write(0x0, 0x34, 0x00);
+			//OpnDll.OPN_Write(0x0, 0x38, 0x00);
+			//OpnDll.OPN_Write(0x0, 0x3C, 0x03);
+			//OpnDll.OPN_Write(0x0, 0x40, 0x11);
+			//OpnDll.OPN_Write(0x0, 0x44, 0x18);
+			//OpnDll.OPN_Write(0x0, 0x48, 0x1B);
+			//OpnDll.OPN_Write(0x0, 0x4C, 0x11);
+			//OpnDll.OPN_Write(0x0, 0x50, 0x1F);
+			//OpnDll.OPN_Write(0x0, 0x54, 0x1F);
+			//OpnDll.OPN_Write(0x0, 0x58, 0x1F);
+			//OpnDll.OPN_Write(0x0, 0x5C, 0x1F);
+			//OpnDll.OPN_Write(0x0, 0x60, 0x06);
+			//OpnDll.OPN_Write(0x0, 0x64, 0x07);
+			//OpnDll.OPN_Write(0x0, 0x68, 0x09);
+			//OpnDll.OPN_Write(0x0, 0x6C, 0x03);
+			//OpnDll.OPN_Write(0x0, 0x70, 0x00);
+			//OpnDll.OPN_Write(0x0, 0x74, 0x00);
+			//OpnDll.OPN_Write(0x0, 0x78, 0x00);
+			//OpnDll.OPN_Write(0x0, 0x7C, 0x00);
+			//OpnDll.OPN_Write(0x0, 0x80, 0x17);
+			//OpnDll.OPN_Write(0x0, 0x84, 0x16);
+			//OpnDll.OPN_Write(0x0, 0x88, 0x15);
+			//OpnDll.OPN_Write(0x0, 0x8C, 0x13);
+			//OpnDll.OPN_Write(0x0, 0xB0, 0x38);
+			//OpnDll.OPN_Write(0x0, 0xB4, 0x00 | 0xC0);
+			//OpnDll.OPN_Write(0, 0x28, 0xF0);
+			const string DACPath = @"00_BassDrum.raw";
+			byte[] sampleData =
+				File.ReadAllBytes(DACPath);
+			OpnDll.SetDACFrequency(0, 15625);
+			OpnDll.SetDACVolume(0, 0x100); // 0x100 = 100%
+			OpnDll.PlayDACSample(0, (uint)sampleData.Length, sampleData, 0);
 		}
 
 		private void Load(FileInfo path){
@@ -98,7 +99,23 @@ namespace MID3SMPS{
 			Load(new FileInfo(fileDialog.FileName));
 		}
 		private void SaveMappingsCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
-		private void OpenInstrumentEditorCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
+		private void OpenInstrumentEditorCommand_Executed(object sender, ExecutedRoutedEventArgs e){
+			if(EditWindow == null || EditWindow.IsClosed){
+				EditWindow = new Ym2612Edit();
+			}
+
+			if(!EditWindow.IsVisible){
+				EditWindow.Show();
+			}
+
+			if(EditWindow.WindowState == WindowState.Minimized){
+				EditWindow.WindowState = WindowState.Normal;
+			}
+
+			EditWindow.Activate();
+			EditWindow.Topmost = true;
+			EditWindow.Topmost = false; // Makes sure window gets put on top but doesn't stay there
+		}
 		private void OpenMappingsEditorCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 		private void TempoCalculatorCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 		private void LoadInsLibCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
