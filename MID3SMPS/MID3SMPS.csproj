@@ -38,6 +38,7 @@
 
     <ItemGroup>
         <None Remove="OPN_DLL.dll"/>
+        <None Remove="Native\x86\OPN_DLL.dll"/>
     </ItemGroup>
 
     <ItemGroup>

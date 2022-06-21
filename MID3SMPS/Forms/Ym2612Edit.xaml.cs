@@ -5,11 +5,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using MahApps.Metro.Controls;
 
 namespace MID3SMPS.Forms;
 
 // Added "YM" to 2612Edit since classes can't start with numbers
 public partial class Ym2612Edit{
+	private readonly MainWindow _mainWindow;
 	private readonly List<Line> lines = new();
 	public WriteableBitmap? Bitmap;
 	private int curXScale = 0;
@@ -26,6 +28,8 @@ public partial class Ym2612Edit{
 							  CompositionTarget.Rendering += UpdateOsc;
 						  },
 						  DispatcherPriority.Render);
+		// ReSharper disable once AssignNullToNotNullAttribute
+		_mainWindow = (MainWindow)Application.Current.MainWindow;
 	}
 	private void OnClosed(object? sender, EventArgs? args){IsClosed = true;}
 
@@ -75,5 +79,17 @@ public partial class Ym2612Edit{
 		renderPosition++;
 		if(renderPosition >= xScale) renderPosition = 0;
 		return line;
+	}
+	private void NumericUpDown_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double?> e){
+		// This function only really needs to be called when the interval isn't 1
+		var control = (NumericUpDown)sender;
+		if(!e.NewValue.HasValue || (control.Interval % 1 != 0)) return;
+		double testValue = e.NewValue.Value - control.Minimum;
+		if((testValue % control.Interval) == 0) return; // New value is in line with interval
+		double rounded = testValue;
+		rounded /= control.Interval;
+		rounded = Math.Round(rounded); // Divide then round instead of just truncating
+		rounded *= control.Interval;
+		control.Value = rounded + control.Minimum;
 	}
 }

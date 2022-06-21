@@ -4,7 +4,7 @@ namespace MID3SMPS;
 
 public class OpnDll{
 	// ReSharper disable once InconsistentNaming
-	public const string OPN_DLL = @"OPN_DLL.dll"; // Full path to DLL
+	public const string OPN_DLL = @"libOPN.dll"; // Full path to DLL
 	[DllImport(OPN_DLL)] public static extern void SetOPNOptions(uint outSmplRate, byte resmplMode, byte chipSmplMode, uint chipSmplRate);
 	[DllImport(OPN_DLL)] public static extern byte OpenOPNDriver(byte chips);
 	[DllImport(OPN_DLL)] public static extern void CloseOPNDriver();

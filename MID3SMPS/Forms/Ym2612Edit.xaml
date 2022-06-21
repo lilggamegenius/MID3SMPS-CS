@@ -6,68 +6,240 @@
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  mc:Ignorable="d"
                  Icon="/MID3SMPS;component/Resources/Icons/2612edit transparent.ico"
-                 Title="2612Edit" Height="600" Width="800">
-    <Grid Margin="5" ShowGridLines="True">
+                 Title="2612Edit" Height="600" Width="800" MinHeight="455">
+    <Grid ShowGridLines="True" >
+        <Grid.Resources>
+            <x:Array x:Key="DetuneOptions" Type="sys:String" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                <sys:String>No Change</sys:String>
+                <sys:String>x (1+e)</sys:String>
+                <sys:String>x (1+2e)</sys:String>
+                <sys:String>x (1+3e)</sys:String>
+                <sys:String>x (1+3e)</sys:String>
+                <sys:String>No Change</sys:String>
+                <sys:String>x (1-e)</sys:String>
+                <sys:String>x (1-2e)</sys:String>
+                <sys:String>x (1-3e)</sys:String>
+                <sys:String>x (1-3e)</sys:String>
+            </x:Array>
+            <x:Array x:Key="RateScalingOptions" Type="sys:String" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                <sys:String>2 x Rate + (KC/8)</sys:String>
+                <sys:String>2 x Rate + (KC/4)</sys:String>
+                <sys:String>2 x Rate + (KC/2)</sys:String>
+                <sys:String>2 x Rate + (KC/1)</sys:String>
+            </x:Array>
+            <x:Array x:Key="EnabledOptions" Type="sys:String" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                <sys:String>Disabled</sys:String>
+                <sys:String>Enabled</sys:String>
+            </x:Array>
+            <Style TargetType="Label">
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="ComboBox">
+                <Setter Property="SelectedIndex" Value="0" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+            </Style>
+            <Style TargetType="mah:NumericUpDown">
+                <Setter Property="NumericInputMode" Value="Numbers" />
+                <Setter Property="Value" Value="0" />
+                <Setter Property="Minimum" Value="0" />
+            </Style>
+        </Grid.Resources>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="10000*"    MinHeight="100"/>
+            <RowDefinition Height="*"    MinHeight="5"             />
+            <RowDefinition Height="*"       MinHeight="350"/>
         </Grid.RowDefinitions>
-        <Grid Margin="5" ShowGridLines="True">
+        <Grid ShowGridLines="True">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap">Voices/mappings</TextBlock>
-            <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap">Button controls</TextBlock>
-            <Canvas Name="Oscilloscope" Grid.Column="2" Grid.ColumnSpan="2" Background="#010"
-                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <TreeView />
+            <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap">
+                Button controls
+            </TextBlock>
+            <Canvas Name="Oscilloscope" Grid.Column="2" Grid.ColumnSpan="2" Background="#010" ClipToBounds="True">
                 <Canvas.LayoutTransform>
                     <ScaleTransform ScaleY="-1" />
                 </Canvas.LayoutTransform>
             </Canvas>
-
         </Grid>
+        
+        <GridSplitter Grid.Row="1" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch" />
 
-        <Grid Margin="5" Grid.Row="1" ShowGridLines="True">
-            <Grid.ColumnDefinitions>  <!-- Lots of spanning about to go on -->
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                <Label HorizontalAlignment="Left" Content="LFO" ToolTip="Low Frequency oscillator" />
-                <ComboBox HorizontalAlignment="Right" HorizontalContentAlignment="Right">
-                    <ComboBoxItem Content="Coffie" />
-                    <ComboBoxItem Content="Tea" />
-                    <ComboBoxItem Content="Orange Juice" />
-                    <ComboBoxItem Content="Milk" />
-                    <ComboBoxItem Content="Iced Tea" />
-                    <ComboBoxItem Content="Mango Shake" />
-                </ComboBox>
-            </StackPanel>
-            <StackPanel Grid.Row="0" Grid.Column="5" />
-            <StackPanel Grid.Row="0" Grid.Column="6" />
-            <StackPanel Grid.Row="4" Grid.Column="5" />
-        </Grid>
+        <TabControl Grid.Row="2">
+            <TabItem Header="Advanced"> <!-- Todo: make this the second tab -->
+                <Grid ShowGridLines="True" >
+                    <Grid.ColumnDefinitions>  <!-- Lots of spanning about to go on -->
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <Label HorizontalAlignment="Left" VerticalAlignment="Center" Content="LFO" ToolTip="Low Frequency oscillator" />
+                        <ComboBox VerticalAlignment="Center" HorizontalAlignment="Stretch" SelectedIndex="0">
+                            <ComboBoxItem Content="Off" />
+                            <ComboBoxItem Content="3.98" />
+                            <ComboBoxItem Content="5.56" />
+                            <ComboBoxItem Content="6.02" />
+                            <ComboBoxItem Content="6.37" />
+                            <ComboBoxItem Content="6.88" />
+                            <ComboBoxItem Content="9.63" />
+                            <ComboBoxItem Content="48.1" />
+                            <ComboBoxItem Content="72.2" />
+                        </ComboBox>
+                    </StackPanel>
+                    <Label Grid.Row="0" Grid.Column="1" Content="Operator 1" HorizontalAlignment="Center"/>
+                    <Label Grid.Row="0" Grid.Column="2" Content="Operator 2" HorizontalAlignment="Center"/>
+                    <Label Grid.Row="0" Grid.Column="3" Content="Operator 3" HorizontalAlignment="Center"/>
+                    <Label Grid.Row="0" Grid.Column="4" Content="Operator 4" HorizontalAlignment="Center"/>
+                    
+                    <Label Grid.Row="1" Grid.Column="0" Content="Detune"/>
+                    <Label Grid.Row="2" Grid.Column="0" Content="Multiple"/>
+                    <Label Grid.Row="3" Grid.Column="0" Content="Total Level"/>
+                    <Label Grid.Row="4" Grid.Column="0" Content="Rate Scaling"/>
+                    <Label Grid.Row="5" Grid.Column="0" Content="Attack Rate"/>
+                    <Label Grid.Row="6" Grid.Column="0" Content="Amplitude Modulation"/>
+                    <Label Grid.Row="7" Grid.Column="0" Content="Decay Rate"/>
+                    <Label Grid.Row="8" Grid.Column="0" Content="Sustain Rate"/>
+                    <Label Grid.Row="9" Grid.Column="0" Content="Sustain Level"/>
+                    <Label Grid.Row="10" Grid.Column="0" Content="Release Rate"/>
+                    <Label Grid.Row="11" Grid.Column="0" Content="SSG-EG"/>
+                    
+                    <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{StaticResource DetuneOptions}"/>
+                    <ComboBox Grid.Row="1" Grid.Column="2" ItemsSource="{StaticResource DetuneOptions}"/>
+                    <ComboBox Grid.Row="1" Grid.Column="3" ItemsSource="{StaticResource DetuneOptions}"/>
+                    <ComboBox Grid.Row="1" Grid.Column="4" ItemsSource="{StaticResource DetuneOptions}"/>
+                    
+                    <mah:NumericUpDown Grid.Row="2" Grid.Column="1" Maximum="15"/>
+                    <mah:NumericUpDown Grid.Row="2" Grid.Column="2" Maximum="15"/>
+                    <mah:NumericUpDown Grid.Row="2" Grid.Column="3" Maximum="15"/>
+                    <mah:NumericUpDown Grid.Row="2" Grid.Column="4" Maximum="15"/>
+                    
+                    <mah:NumericUpDown Grid.Row="3" Grid.Column="1" Maximum="127"/>
+                    <mah:NumericUpDown Grid.Row="3" Grid.Column="2" Maximum="127"/>
+                    <mah:NumericUpDown Grid.Row="3" Grid.Column="3" Maximum="127"/>
+                    <mah:NumericUpDown Grid.Row="3" Grid.Column="4" Maximum="127"/>
+
+                    <ComboBox Grid.Row="4" Grid.Column="1" ItemsSource="{StaticResource RateScalingOptions}"/>
+                    <ComboBox Grid.Row="4" Grid.Column="2" ItemsSource="{StaticResource RateScalingOptions}"/>
+                    <ComboBox Grid.Row="4" Grid.Column="3" ItemsSource="{StaticResource RateScalingOptions}"/>
+                    <ComboBox Grid.Row="4" Grid.Column="4" ItemsSource="{StaticResource RateScalingOptions}"/>
+                    
+                    <mah:NumericUpDown Grid.Row="5" Grid.Column="1" Maximum="31"/>
+                    <mah:NumericUpDown Grid.Row="5" Grid.Column="2" Maximum="31"/>
+                    <mah:NumericUpDown Grid.Row="5" Grid.Column="3" Maximum="31"/>
+                    <mah:NumericUpDown Grid.Row="5" Grid.Column="4" Maximum="31"/>
+                    
+                    <ComboBox Grid.Row="6" Grid.Column="1" ItemsSource="{StaticResource EnabledOptions}"/>
+                    <ComboBox Grid.Row="6" Grid.Column="2" ItemsSource="{StaticResource EnabledOptions}"/>
+                    <ComboBox Grid.Row="6" Grid.Column="3" ItemsSource="{StaticResource EnabledOptions}"/>
+                    <ComboBox Grid.Row="6" Grid.Column="4" ItemsSource="{StaticResource EnabledOptions}"/>
+                    
+                    <mah:NumericUpDown Grid.Row="7" Grid.Column="1" Maximum="31"/>
+                    <mah:NumericUpDown Grid.Row="7" Grid.Column="2" Maximum="31"/>
+                    <mah:NumericUpDown Grid.Row="7" Grid.Column="3" Maximum="31"/>
+                    <mah:NumericUpDown Grid.Row="7" Grid.Column="4" Maximum="31"/>
+                    
+                    <mah:NumericUpDown Grid.Row="8" Grid.Column="1" Maximum="31"/>
+                    <mah:NumericUpDown Grid.Row="8" Grid.Column="2" Maximum="31"/>
+                    <mah:NumericUpDown Grid.Row="8" Grid.Column="3" Maximum="31"/>
+                    <mah:NumericUpDown Grid.Row="8" Grid.Column="4" Maximum="31"/>
+                    
+                    <mah:NumericUpDown Grid.Row="9" Grid.Column="1" Maximum="120" Interval="8" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
+                    <mah:NumericUpDown Grid.Row="9" Grid.Column="2" Maximum="120" Interval="8" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
+                    <mah:NumericUpDown Grid.Row="9" Grid.Column="3" Maximum="120" Interval="8" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
+                    <mah:NumericUpDown Grid.Row="9" Grid.Column="4" Maximum="120" Interval="8" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
+                    
+                    <mah:NumericUpDown Grid.Row="10" Grid.Column="1" Value="1" Minimum="1" Maximum="31" Interval="2" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
+                    <mah:NumericUpDown Grid.Row="10" Grid.Column="2" Value="1" Minimum="1" Maximum="31" Interval="2" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
+                    <mah:NumericUpDown Grid.Row="10" Grid.Column="3" Value="1" Minimum="1" Maximum="31" Interval="2" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
+                    <mah:NumericUpDown Grid.Row="10" Grid.Column="4" Value="1" Minimum="1" Maximum="31" Interval="2" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
+                    
+                    <ComboBox Grid.Row="11" Grid.Column="1" ItemsSource="{StaticResource EnabledOptions}" IsEnabled="False"/>
+                    <ComboBox Grid.Row="11" Grid.Column="2" ItemsSource="{StaticResource EnabledOptions}" IsEnabled="False"/>
+                    <ComboBox Grid.Row="11" Grid.Column="3" ItemsSource="{StaticResource EnabledOptions}" IsEnabled="False"/>
+                    <ComboBox Grid.Row="11" Grid.Column="4" ItemsSource="{StaticResource EnabledOptions}" IsEnabled="False"/>
+
+                    <StackPanel Grid.Row="0" Grid.Column="5" Orientation="Horizontal">
+                        <Label Content="AMS" ToolTip="Low Frequency oscillator" />
+                        <ComboBox SelectedIndex="0">
+                            <ComboBoxItem Content="0" />
+                            <ComboBoxItem Content="1.4" />
+                            <ComboBoxItem Content="5.9" />
+                            <ComboBoxItem Content="11.8" />
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Grid.Row="0" Grid.Column="6" Orientation="Horizontal">
+                        <Label Content="FMS %" ToolTip="Low Frequency oscillator" />
+                        <ComboBox>
+                            <ComboBoxItem Content="0" />
+                            <ComboBoxItem Content="±3.4" />
+                            <ComboBoxItem Content="±6.7" />
+                            <ComboBoxItem Content="±10" />
+                            <ComboBoxItem Content="±14" />
+                            <ComboBoxItem Content="±20" />
+                            <ComboBoxItem Content="±40" />
+                            <ComboBoxItem Content="±80" />
+                        </ComboBox>
+                    </StackPanel>
+                    
+                    <Label Grid.Row="1" Grid.Column="5" Content="Feedback"/>
+                    <ComboBox Grid.Row="1" Grid.Column="6">
+                        <ComboBoxItem Content="Off" />
+                        <ComboBoxItem Content="Pi / 16" />
+                        <ComboBoxItem Content="Pi / 8" />
+                        <ComboBoxItem Content="Pi / 4" />
+                        <ComboBoxItem Content="Pi / 2" />
+                        <ComboBoxItem Content="Pi" />
+                        <ComboBoxItem Content="2 x Pi" />
+                        <ComboBoxItem Content="4 x Pi" />
+                    </ComboBox>
+                    
+                    <Label Grid.Row="2" Grid.Column="5" Content="Algorithm"/>
+                    <ComboBox Grid.Row="2" Grid.Column="6">
+                        <ComboBoxItem Content="0 (Out 4)" />
+                        <ComboBoxItem Content="1 (Out 4)" />
+                        <ComboBoxItem Content="2 (Out 4)" />
+                        <ComboBoxItem Content="3 (Out 4)" />
+                        <ComboBoxItem Content="4 (Out 2-4)" />
+                        <ComboBoxItem Content="5 (Out 2-3-4)" />
+                        <ComboBoxItem Content="6 (Out 2-3-4)" />
+                        <ComboBoxItem Content="7 (Out 1-2-3-4)" />
+                    </ComboBox>
+                    
+                    <Label Grid.Row="3" Grid.Column="5" Content="Transposition"/>
+                    <ComboBox Grid.Row="3" Grid.Column="6">
+                        <ComboBoxItem Content="0 (Default)" />
+                    </ComboBox>
+
+                    <StackPanel Grid.Row="4" Grid.Column="5" Orientation="Horizontal" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Pretty">
+                <Label Content="Boo" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+            </TabItem>
+        </TabControl>
     </Grid>
 </mah:MetroWindow>

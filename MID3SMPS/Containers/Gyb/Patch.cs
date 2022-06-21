@@ -1,11 +1,13 @@
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 
 namespace MID3SMPS.Containers.Gyb;
 
-public struct Instrument{
+[DebuggerDisplay("{Name}: 0x{TotalSize.ToString(\"X4\")}")]
+public struct Patch{
 	public const byte InstrumentRegistersSize = 0x1E;
 
 	public string Name;
@@ -17,7 +19,7 @@ public struct Instrument{
 	public Chords ChordNotes;
 
 	// Version of Instrument, and Instrument data
-	public Instrument(int version, in Span<byte> data){
+	public Patch(int version, in Span<byte> data){
 		Name = null!;
 		TotalSize = 0;
 		Registers = new byte[InstrumentRegistersSize];

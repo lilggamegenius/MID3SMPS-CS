@@ -2,50 +2,50 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace MID3SMPS.Containers.Gyb{
-	public class GYB{
-		private sbyte defaultLFOSpeed;
-		private List<Instrument> Instruments = new();
+namespace MID3SMPS.Containers.Gyb;
 
-		public static GYB LoadGYB(FileInfo path){
-			Span<byte> gybData = File.ReadAllBytes(path.FullName);
-			if(gybData[0] != 26 || gybData[1] != 12) throw new FormatException("Not a valid GYB formatted file");
-			GYB gyb = new();
-			byte version = gybData[2];
-			return version switch{
-				1=>LoadV1(gyb, gybData),
-				2=>LoadV2(gyb, gybData),
-				3=>LoadV3(gyb, gybData),
-				var _=>throw new FormatException("Not a valid GYB formatted file")
-			};
+public class GYB{
+	public readonly List<Patch> Patches = new();
+	private sbyte defaultLFOSpeed;
+
+	public static GYB LoadGYB(FileInfo path){
+		Span<byte> gybData = File.ReadAllBytes(path.FullName);
+		if(gybData[0] != 26 || gybData[1] != 12) throw new FormatException("Not a valid GYB formatted file");
+		GYB gyb = new();
+		byte version = gybData[2];
+		return version switch{
+			1=>LoadV1(gyb, gybData),
+			2=>LoadV2(gyb, gybData),
+			3=>LoadV3(gyb, gybData),
+			var _=>throw new FormatException("Not a valid GYB formatted file")
+		};
+	}
+
+	private static GYB LoadV1(GYB gyb, Span<byte> gybData){return gyb;}
+
+	private static GYB LoadV2(GYB gyb, Span<byte> gybData){
+		gyb.defaultLFOSpeed = (sbyte)gybData[105];
+		return gyb;
+	}
+
+	private static GYB LoadV3(GYB gyb, Span<byte> gybData){
+		gyb.defaultLFOSpeed = (sbyte)gybData[3];
+		uint filesize = BitConverter.ToUInt32(gybData[0x4..]);
+		if(filesize != gybData.Length) throw new FormatException("Not a valid GYB formatted file");
+		uint bankOffset = BitConverter.ToUInt32(gybData[0x8..]);
+		uint mapsOffset = BitConverter.ToUInt32(gybData[0xC..]);
+		ushort instrumentCount = BitConverter.ToUInt16(gybData[(int)bankOffset..]);
+		uint currentOffset = bankOffset; // First 2 bytes are the count
+		for(int currentInstrument = 0; currentInstrument < instrumentCount; currentInstrument++){
+			ushort instrumentSize = BitConverter.ToUInt16(gybData[((int)currentOffset + 2)..]);
+			var patch = new Patch(3,
+								  gybData.Slice((int)currentOffset + 2,
+												instrumentSize));
+			gyb.Patches.Add(patch);
+			currentOffset += instrumentSize;
 		}
 
-		private static GYB LoadV1(GYB gyb, Span<byte> gybData){return gyb;}
-
-		private static GYB LoadV2(GYB gyb, Span<byte> gybData){
-			gyb.defaultLFOSpeed = (sbyte)gybData[105];
-			return gyb;
-		}
-
-		private static GYB LoadV3(GYB gyb, Span<byte> gybData){
-			gyb.defaultLFOSpeed = (sbyte)gybData[3];
-			uint filesize = BitConverter.ToUInt32(gybData[0x4..]);
-			if(filesize != gybData.Length) throw new FormatException("Not a valid GYB formatted file");
-			uint bankOffset = BitConverter.ToUInt32(gybData[0x8..]);
-			uint mapsOffset = BitConverter.ToUInt32(gybData[0xC..]);
-			ushort instrumentCount = BitConverter.ToUInt16(gybData[(int)bankOffset..]);
-			uint currentOffset = bankOffset; // First 2 bytes are the count
-			for(int currentInstrument = 0; currentInstrument < instrumentCount; currentInstrument++){
-				ushort instrumentSize = BitConverter.ToUInt16(gybData[((int)currentOffset + 2)..]);
-				var ins = new Instrument(3,
-										 gybData.Slice((int)currentOffset + 2,
-													   instrumentSize));
-				gyb.Instruments.Add(ins);
-				currentOffset += instrumentSize;
-			}
-
-			return gyb;
-		}
+		return gyb;
 	}
 }
 
