@@ -1,245 +1,411 @@
-<mah:MetroWindow x:Class="MID3SMPS.Forms.Ym2612Edit"
-                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-                 mc:Ignorable="d"
-                 Icon="/MID3SMPS;component/Resources/Icons/2612edit transparent.ico"
-                 Title="2612Edit" Height="600" Width="800" MinHeight="455">
-    <Grid ShowGridLines="True" >
-        <Grid.Resources>
-            <x:Array x:Key="DetuneOptions" Type="sys:String" xmlns:sys="clr-namespace:System;assembly=mscorlib">
-                <sys:String>No Change</sys:String>
-                <sys:String>x (1+e)</sys:String>
-                <sys:String>x (1+2e)</sys:String>
-                <sys:String>x (1+3e)</sys:String>
-                <sys:String>x (1+3e)</sys:String>
-                <sys:String>No Change</sys:String>
-                <sys:String>x (1-e)</sys:String>
-                <sys:String>x (1-2e)</sys:String>
-                <sys:String>x (1-3e)</sys:String>
-                <sys:String>x (1-3e)</sys:String>
-            </x:Array>
-            <x:Array x:Key="RateScalingOptions" Type="sys:String" xmlns:sys="clr-namespace:System;assembly=mscorlib">
-                <sys:String>2 x Rate + (KC/8)</sys:String>
-                <sys:String>2 x Rate + (KC/4)</sys:String>
-                <sys:String>2 x Rate + (KC/2)</sys:String>
-                <sys:String>2 x Rate + (KC/1)</sys:String>
-            </x:Array>
-            <x:Array x:Key="EnabledOptions" Type="sys:String" xmlns:sys="clr-namespace:System;assembly=mscorlib">
-                <sys:String>Disabled</sys:String>
-                <sys:String>Enabled</sys:String>
-            </x:Array>
-            <Style TargetType="Label">
-                <Setter Property="HorizontalAlignment" Value="Right"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-            </Style>
-            <Style TargetType="ComboBox">
-                <Setter Property="SelectedIndex" Value="0" />
-                <Setter Property="VerticalContentAlignment" Value="Center" />
-            </Style>
-            <Style TargetType="mah:NumericUpDown">
-                <Setter Property="NumericInputMode" Value="Numbers" />
-                <Setter Property="Value" Value="0" />
-                <Setter Property="Minimum" Value="0" />
-            </Style>
-        </Grid.Resources>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="10000*"    MinHeight="100"/>
-            <RowDefinition Height="*"    MinHeight="5"             />
-            <RowDefinition Height="*"       MinHeight="350"/>
-        </Grid.RowDefinitions>
-        <Grid ShowGridLines="True">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <TreeView />
-            <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap">
-                Button controls
-            </TextBlock>
-            <Canvas Name="Oscilloscope" Grid.Column="2" Grid.ColumnSpan="2" Background="#010" ClipToBounds="True">
-                <Canvas.LayoutTransform>
-                    <ScaleTransform ScaleY="-1" />
-                </Canvas.LayoutTransform>
-            </Canvas>
-        </Grid>
-        
-        <GridSplitter Grid.Row="1" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch" />
+<mah:MetroWindow
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:gyb="clr-namespace:MID3SMPS.Containers.Gyb"
+    xmlns:utils="clr-namespace:MID3SMPS.Utils"
+    xmlns:local="clr-namespace:MID3SMPS.Forms"
+    xmlns:userControls="clr-namespace:MID3SMPS.UserControls"
+    x:Class="MID3SMPS.Forms.Ym2612Edit"
+    mc:Ignorable="d"
+    Icon="/MID3SMPS;component/Resources/Icons/2612edit transparent.ico"
+    Title="2612Edit" Height="600" Width="850" MinHeight="455" MinWidth="600">
+    <mah:MetroWindow.DataContext>
+        <Binding RelativeSource="{RelativeSource AncestorType=local:Ym2612Edit}" />
+    </mah:MetroWindow.DataContext>
+    <mah:MetroWindow.Resources>
+        <x:Array x:Key="EnabledOptions" Type="{x:Type sys:String}">
+            <sys:String>Disabled</sys:String>
+            <sys:String>Enabled</sys:String>
+        </x:Array>
+        <sys:String x:Key="DecimalFormat">{0}</sys:String>
+        <sys:String x:Key="HexFormat">{0:X}</sys:String>
+        <Style TargetType="{x:Type userControls:BetterLabel}">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="Margin" Value="1" />
+        </Style>
+        <Style x:Key="HexHeader" TargetType="{x:Type userControls:BetterLabel}">
+            <Setter Property="Background" Value="{StaticResource MahApps.Brushes.Accent}" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+        </Style>
+        <Style x:Key="HexText" TargetType="{x:Type userControls:BetterLabel}">
+            <Setter Property="ContentStringFormat" Value="{}{0:X2}" />
+            <Setter Property="Background" Value="{StaticResource MahApps.Brushes.Accent4}" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="Header" TargetType="{x:Type userControls:BetterLabel}">
+            <Setter Property="Background" Value="{StaticResource MahApps.Brushes.Accent}" />
+            <Setter Property="HorizontalContentAlignment" Value="Right" />
+        </Style>
+        <Style x:Key="ValueField" TargetType="Control">
+            <Setter Property="Background" Value="{StaticResource MahApps.Brushes.Accent4}" />
+        </Style>
+        <Style TargetType="{x:Type ComboBox}">
+            <Setter Property="SelectedIndex" Value="0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="{x:Type mah:NumericUpDown}">
+            <Setter Property="NumericInputMode" Value="Numbers" />
+            <Setter Property="Value" Value="0" />
+            <Setter Property="Minimum" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="ParsingNumberStyle" Value="Integer" />
+            <Style.Triggers>
+                <DataTrigger Binding ="{Binding ElementName = HexEnabled, Path = IsChecked }" Value="False">
+                    <Setter Property="StringFormat" Value="{StaticResource DecimalFormat}" />
+                </DataTrigger>
+                <DataTrigger Binding ="{Binding ElementName = HexEnabled, Path = IsChecked }" Value="True">
+                    <Setter Property="StringFormat" Value="{StaticResource HexFormat}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type Grid}">
+            <!--<Setter Property="Margin" Value="-4,-4,0,-4" />-->
+        </Style>
+    </mah:MetroWindow.Resources>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem x:Name="OpenBank" Header="_Open new bank"/>
+            <MenuItem x:Name="SaveBank" Header="_Save bank"/>
+            <MenuItem x:Name="BankSwitch" Header="_Bank switch">
+                <MenuItem Header="_Melodic" IsCheckable="True" IsChecked="True"/>
+                <MenuItem Header="_Drum" IsCheckable="True"/>
+            </MenuItem>
+            <MenuItem x:Name="ImportFile" Header="_Import from file"/>
+            <MenuItem x:Name="AboutItem" Header="_About" />
+        </Menu>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock Name="Status" Text="Ready." />
+            </StatusBarItem>
+        </StatusBar>
+        <Grid Margin="0,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="10000*" MinHeight="100" />
+                <RowDefinition Height="*" MinHeight="5" />
+                <RowDefinition Height="*" MinHeight="300" />
+            </Grid.RowDefinitions>
+            <Grid Margin="0,0,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ListView d:ItemsSource="{d:SampleData ItemCount=5}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <ListView Grid.Column="1" />
+                <Canvas x:Name="Oscilloscope" Grid.Column="2" Grid.ColumnSpan="2" Background="#010" ClipToBounds="True">
+                    <Canvas.LayoutTransform>
+                        <ScaleTransform ScaleY="-1" />
+                    </Canvas.LayoutTransform>
+                </Canvas>
+            </Grid>
 
-        <TabControl Grid.Row="2">
-            <TabItem Header="Advanced"> <!-- Todo: make this the second tab -->
-                <Grid ShowGridLines="True" >
-                    <Grid.ColumnDefinitions>  <!-- Lots of spanning about to go on -->
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <StackPanel Orientation="Horizontal">
-                        <Label HorizontalAlignment="Left" VerticalAlignment="Center" Content="LFO" ToolTip="Low Frequency oscillator" />
-                        <ComboBox VerticalAlignment="Center" HorizontalAlignment="Stretch" SelectedIndex="0">
+            <GridSplitter Grid.Row="1" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch" />
+
+            <TabControl Grid.Row="2">
+                <TabItem Header="Digital">
+                    <!-- Todo: make this the second tab -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <!-- Lots of spanning about to go on -->
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <userControls:BetterLabel Content="LFO" ToolTip="Low Frequency oscillator" Style="{StaticResource Header}" />
+                            <ComboBox Grid.Column="1" SelectedIndex="0">
+                                <ComboBoxItem Content="Off" />
+                                <ComboBoxItem Content="3.98" />
+                                <ComboBoxItem Content="5.56" />
+                                <ComboBoxItem Content="6.02" />
+                                <ComboBoxItem Content="6.37" />
+                                <ComboBoxItem Content="6.88" />
+                                <ComboBoxItem Content="9.63" />
+                                <ComboBoxItem Content="48.1" />
+                                <ComboBoxItem Content="72.2" />
+                            </ComboBox>
+                        </Grid>
+                        <userControls:BetterLabel Grid.Row="0" Grid.Column="1" Content="Operator 1" HorizontalContentAlignment="Center" Style="{StaticResource Header}" />
+                        <userControls:BetterLabel Grid.Row="0" Grid.Column="2" Content="Operator 2" HorizontalContentAlignment="Center" Style="{StaticResource Header}" />
+                        <userControls:BetterLabel Grid.Row="0" Grid.Column="3" Content="Operator 3" HorizontalContentAlignment="Center" Style="{StaticResource Header}" />
+                        <userControls:BetterLabel Grid.Row="0" Grid.Column="4" Content="Operator 4" HorizontalContentAlignment="Center" Style="{StaticResource Header}" />
+
+
+                        <userControls:BetterLabel Grid.Row="1" Grid.Column="0" Content="Detune" Style="{StaticResource Header}" />
+                        <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Source={utils:EnumBindingSource {x:Type gyb:DetuneModes}}}"
+                                  SelectedItem="{Binding CurrentPatch.Operators[0].Detune, Mode=TwoWay}" />
+                        <ComboBox Grid.Row="1" Grid.Column="2" />
+                        <ComboBox Grid.Row="1" Grid.Column="3" />
+                        <ComboBox Grid.Row="1" Grid.Column="4" />
+
+                        <userControls:BetterLabel Grid.Row="2" Grid.Column="0" Content="Multiple" Style="{StaticResource Header}" />
+                        <mah:NumericUpDown Grid.Row="2" Grid.Column="1" Maximum="15"
+                                           Value="{Binding CurrentPatch.Operators[0].Multiple, Mode=TwoWay}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="2" Grid.Column="2" Maximum="15"
+                                           Value="{Binding CurrentPatch.Operators[1].Multiple, Mode=TwoWay}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="2" Grid.Column="3" Maximum="15"
+                                           Value="{Binding CurrentPatch.Operators[2].Multiple, Mode=TwoWay}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="2" Grid.Column="4" Maximum="15"
+                                           Value="{Binding CurrentPatch.Operators[3].Multiple, Mode=TwoWay}" Style="{StaticResource ValueField}" />
+
+                        <userControls:BetterLabel Grid.Row="3" Grid.Column="0" Content="Total Level" Style="{StaticResource Header}" />
+                        <mah:NumericUpDown Grid.Row="3" Grid.Column="1" Maximum="127" Value="{Binding CurrentPatch.Operators[0].TotalLevel}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="3" Grid.Column="2" Maximum="127" Value="{Binding CurrentPatch.Operators[1].TotalLevel}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="3" Grid.Column="3" Maximum="127" Value="{Binding CurrentPatch.Operators[2].TotalLevel}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="3" Grid.Column="4" Maximum="127" Value="{Binding CurrentPatch.Operators[3].TotalLevel}" Style="{StaticResource ValueField}" />
+
+                        <userControls:BetterLabel Grid.Row="4" Grid.Column="0" Content="Rate Scaling" Style="{StaticResource Header}" />
+                        <ComboBox Grid.Row="4" Grid.Column="1" />
+                        <ComboBox Grid.Row="4" Grid.Column="2" />
+                        <ComboBox Grid.Row="4" Grid.Column="3" />
+                        <ComboBox Grid.Row="4" Grid.Column="4" />
+
+                        <userControls:BetterLabel Grid.Row="5" Grid.Column="0" Content="Attack Rate" Style="{StaticResource Header}" />
+                        <mah:NumericUpDown Grid.Row="5" Grid.Column="1" Maximum="31" Value="{Binding CurrentPatch.Operators[0].AttackRate}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="5" Grid.Column="2" Maximum="31" Value="{Binding CurrentPatch.Operators[1].AttackRate}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="5" Grid.Column="3" Maximum="31" Value="{Binding CurrentPatch.Operators[2].AttackRate}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="5" Grid.Column="4" Maximum="31" Value="{Binding CurrentPatch.Operators[3].AttackRate}" Style="{StaticResource ValueField}" />
+
+                        <userControls:BetterLabel Grid.Row="6" Grid.Column="0" Content="Amplitude Modulation" Style="{StaticResource Header}" />
+                        <ComboBox Grid.Row="6" Grid.Column="1" ItemsSource="{StaticResource EnabledOptions}" Style="{StaticResource ValueField}" />
+                        <ComboBox Grid.Row="6" Grid.Column="2" ItemsSource="{StaticResource EnabledOptions}" Style="{StaticResource ValueField}" />
+                        <ComboBox Grid.Row="6" Grid.Column="3" ItemsSource="{StaticResource EnabledOptions}" Style="{StaticResource ValueField}" />
+                        <ComboBox Grid.Row="6" Grid.Column="4" ItemsSource="{StaticResource EnabledOptions}" Style="{StaticResource ValueField}" />
+
+                        <userControls:BetterLabel Grid.Row="7" Grid.Column="0" Content="Decay Rate" Style="{StaticResource Header}" />
+                        <mah:NumericUpDown Grid.Row="7" Grid.Column="1" Maximum="31" Value="{Binding CurrentPatch.Operators[0].DecayRate}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="7" Grid.Column="2" Maximum="31" Value="{Binding CurrentPatch.Operators[1].DecayRate}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="7" Grid.Column="3" Maximum="31" Value="{Binding CurrentPatch.Operators[2].DecayRate}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="7" Grid.Column="4" Maximum="31" Value="{Binding CurrentPatch.Operators[3].DecayRate}" Style="{StaticResource ValueField}" />
+
+                        <userControls:BetterLabel Grid.Row="8" Grid.Column="0" Content="Sustain Rate" Style="{StaticResource Header}" />
+                        <mah:NumericUpDown Grid.Row="8" Grid.Column="1" Maximum="31" Value="{Binding CurrentPatch.Operators[0].SustainRate}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="8" Grid.Column="2" Maximum="31" Value="{Binding CurrentPatch.Operators[1].SustainRate}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="8" Grid.Column="3" Maximum="31" Value="{Binding CurrentPatch.Operators[2].SustainRate}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="8" Grid.Column="4" Maximum="31" Value="{Binding CurrentPatch.Operators[3].SustainRate}" Style="{StaticResource ValueField}" />
+
+                        <userControls:BetterLabel Grid.Row="9" Grid.Column="0" Content="Sustain Level" Style="{StaticResource Header}" />
+                        <mah:NumericUpDown Grid.Row="9" Grid.Column="1" Maximum="15" Value="{Binding CurrentPatch.Operators[0].SustainLevel}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="9" Grid.Column="2" Maximum="15" Value="{Binding CurrentPatch.Operators[1].SustainLevel}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="9" Grid.Column="3" Maximum="15" Value="{Binding CurrentPatch.Operators[2].SustainLevel}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="9" Grid.Column="4" Maximum="15" Value="{Binding CurrentPatch.Operators[3].SustainLevel}" Style="{StaticResource ValueField}" />
+
+                        <userControls:BetterLabel Grid.Row="10" Grid.Column="0" Content="Release Rate" Style="{StaticResource Header}" />
+                        <mah:NumericUpDown Grid.Row="10" Grid.Column="1" Minimum="1" Maximum="31" Interval="2" NumericInputMode="Numbers"
+                                           ValueChanged="NumericUpDown_OnValueChanged" Value="{Binding CurrentPatch.Operators[0].ReleaseRate}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="10" Grid.Column="2" Minimum="1" Maximum="31" Interval="2" NumericInputMode="Numbers"
+                                           ValueChanged="NumericUpDown_OnValueChanged" Value="{Binding CurrentPatch.Operators[1].ReleaseRate}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="10" Grid.Column="3" Minimum="1" Maximum="31" Interval="2" NumericInputMode="Numbers"
+                                           ValueChanged="NumericUpDown_OnValueChanged" Value="{Binding CurrentPatch.Operators[2].ReleaseRate}" Style="{StaticResource ValueField}" />
+                        <mah:NumericUpDown Grid.Row="10" Grid.Column="4" Minimum="1" Maximum="31" Interval="2" NumericInputMode="Numbers"
+                                           ValueChanged="NumericUpDown_OnValueChanged" Value="{Binding CurrentPatch.Operators[3].ReleaseRate}" Style="{StaticResource ValueField}" />
+
+                        <userControls:BetterLabel Grid.Row="11" Grid.Column="0" Content="SSG-EG" Style="{StaticResource Header}" />
+                        <ComboBox Grid.Row="11" Grid.Column="1" ItemsSource="{StaticResource EnabledOptions}" />
+                        <ComboBox Grid.Row="11" Grid.Column="2" ItemsSource="{StaticResource EnabledOptions}" />
+                        <ComboBox Grid.Row="11" Grid.Column="3" ItemsSource="{StaticResource EnabledOptions}" />
+                        <ComboBox Grid.Row="11" Grid.Column="4" ItemsSource="{StaticResource EnabledOptions}" />
+
+                        <Grid Grid.Row="0" Grid.Column="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <userControls:BetterLabel Content="AMS" ToolTip="Low Frequency oscillator" Style="{StaticResource Header}" />
+                            <ComboBox Grid.Column="1" SelectedIndex="0">
+                                <ComboBoxItem Content="0" />
+                                <ComboBoxItem Content="1.4" />
+                                <ComboBoxItem Content="5.9" />
+                                <ComboBoxItem Content="11.8" />
+                            </ComboBox>
+                        </Grid>
+                        <Grid Grid.Row="0" Grid.Column="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <userControls:BetterLabel Content="FMS %" ToolTip="Low Frequency oscillator" Style="{StaticResource Header}" />
+                            <ComboBox Grid.Column="1">
+                                <ComboBoxItem Content="0" />
+                                <ComboBoxItem Content="±3.4" />
+                                <ComboBoxItem Content="±6.7" />
+                                <ComboBoxItem Content="±10" />
+                                <ComboBoxItem Content="±14" />
+                                <ComboBoxItem Content="±20" />
+                                <ComboBoxItem Content="±40" />
+                                <ComboBoxItem Content="±80" />
+                            </ComboBox>
+                        </Grid>
+
+                        <userControls:BetterLabel Grid.Row="1" Grid.Column="5" Content="Feedback" Style="{StaticResource Header}" />
+                        <ComboBox Grid.Row="1" Grid.Column="6">
                             <ComboBoxItem Content="Off" />
-                            <ComboBoxItem Content="3.98" />
-                            <ComboBoxItem Content="5.56" />
-                            <ComboBoxItem Content="6.02" />
-                            <ComboBoxItem Content="6.37" />
-                            <ComboBoxItem Content="6.88" />
-                            <ComboBoxItem Content="9.63" />
-                            <ComboBoxItem Content="48.1" />
-                            <ComboBoxItem Content="72.2" />
+                            <ComboBoxItem Content="Pi / 16" />
+                            <ComboBoxItem Content="Pi / 8" />
+                            <ComboBoxItem Content="Pi / 4" />
+                            <ComboBoxItem Content="Pi / 2" />
+                            <ComboBoxItem Content="Pi" />
+                            <ComboBoxItem Content="2 x Pi" />
+                            <ComboBoxItem Content="4 x Pi" />
                         </ComboBox>
-                    </StackPanel>
-                    <Label Grid.Row="0" Grid.Column="1" Content="Operator 1" HorizontalAlignment="Center"/>
-                    <Label Grid.Row="0" Grid.Column="2" Content="Operator 2" HorizontalAlignment="Center"/>
-                    <Label Grid.Row="0" Grid.Column="3" Content="Operator 3" HorizontalAlignment="Center"/>
-                    <Label Grid.Row="0" Grid.Column="4" Content="Operator 4" HorizontalAlignment="Center"/>
-                    
-                    <Label Grid.Row="1" Grid.Column="0" Content="Detune"/>
-                    <Label Grid.Row="2" Grid.Column="0" Content="Multiple"/>
-                    <Label Grid.Row="3" Grid.Column="0" Content="Total Level"/>
-                    <Label Grid.Row="4" Grid.Column="0" Content="Rate Scaling"/>
-                    <Label Grid.Row="5" Grid.Column="0" Content="Attack Rate"/>
-                    <Label Grid.Row="6" Grid.Column="0" Content="Amplitude Modulation"/>
-                    <Label Grid.Row="7" Grid.Column="0" Content="Decay Rate"/>
-                    <Label Grid.Row="8" Grid.Column="0" Content="Sustain Rate"/>
-                    <Label Grid.Row="9" Grid.Column="0" Content="Sustain Level"/>
-                    <Label Grid.Row="10" Grid.Column="0" Content="Release Rate"/>
-                    <Label Grid.Row="11" Grid.Column="0" Content="SSG-EG"/>
-                    
-                    <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{StaticResource DetuneOptions}"/>
-                    <ComboBox Grid.Row="1" Grid.Column="2" ItemsSource="{StaticResource DetuneOptions}"/>
-                    <ComboBox Grid.Row="1" Grid.Column="3" ItemsSource="{StaticResource DetuneOptions}"/>
-                    <ComboBox Grid.Row="1" Grid.Column="4" ItemsSource="{StaticResource DetuneOptions}"/>
-                    
-                    <mah:NumericUpDown Grid.Row="2" Grid.Column="1" Maximum="15"/>
-                    <mah:NumericUpDown Grid.Row="2" Grid.Column="2" Maximum="15"/>
-                    <mah:NumericUpDown Grid.Row="2" Grid.Column="3" Maximum="15"/>
-                    <mah:NumericUpDown Grid.Row="2" Grid.Column="4" Maximum="15"/>
-                    
-                    <mah:NumericUpDown Grid.Row="3" Grid.Column="1" Maximum="127"/>
-                    <mah:NumericUpDown Grid.Row="3" Grid.Column="2" Maximum="127"/>
-                    <mah:NumericUpDown Grid.Row="3" Grid.Column="3" Maximum="127"/>
-                    <mah:NumericUpDown Grid.Row="3" Grid.Column="4" Maximum="127"/>
 
-                    <ComboBox Grid.Row="4" Grid.Column="1" ItemsSource="{StaticResource RateScalingOptions}"/>
-                    <ComboBox Grid.Row="4" Grid.Column="2" ItemsSource="{StaticResource RateScalingOptions}"/>
-                    <ComboBox Grid.Row="4" Grid.Column="3" ItemsSource="{StaticResource RateScalingOptions}"/>
-                    <ComboBox Grid.Row="4" Grid.Column="4" ItemsSource="{StaticResource RateScalingOptions}"/>
-                    
-                    <mah:NumericUpDown Grid.Row="5" Grid.Column="1" Maximum="31"/>
-                    <mah:NumericUpDown Grid.Row="5" Grid.Column="2" Maximum="31"/>
-                    <mah:NumericUpDown Grid.Row="5" Grid.Column="3" Maximum="31"/>
-                    <mah:NumericUpDown Grid.Row="5" Grid.Column="4" Maximum="31"/>
-                    
-                    <ComboBox Grid.Row="6" Grid.Column="1" ItemsSource="{StaticResource EnabledOptions}"/>
-                    <ComboBox Grid.Row="6" Grid.Column="2" ItemsSource="{StaticResource EnabledOptions}"/>
-                    <ComboBox Grid.Row="6" Grid.Column="3" ItemsSource="{StaticResource EnabledOptions}"/>
-                    <ComboBox Grid.Row="6" Grid.Column="4" ItemsSource="{StaticResource EnabledOptions}"/>
-                    
-                    <mah:NumericUpDown Grid.Row="7" Grid.Column="1" Maximum="31"/>
-                    <mah:NumericUpDown Grid.Row="7" Grid.Column="2" Maximum="31"/>
-                    <mah:NumericUpDown Grid.Row="7" Grid.Column="3" Maximum="31"/>
-                    <mah:NumericUpDown Grid.Row="7" Grid.Column="4" Maximum="31"/>
-                    
-                    <mah:NumericUpDown Grid.Row="8" Grid.Column="1" Maximum="31"/>
-                    <mah:NumericUpDown Grid.Row="8" Grid.Column="2" Maximum="31"/>
-                    <mah:NumericUpDown Grid.Row="8" Grid.Column="3" Maximum="31"/>
-                    <mah:NumericUpDown Grid.Row="8" Grid.Column="4" Maximum="31"/>
-                    
-                    <mah:NumericUpDown Grid.Row="9" Grid.Column="1" Maximum="120" Interval="8" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
-                    <mah:NumericUpDown Grid.Row="9" Grid.Column="2" Maximum="120" Interval="8" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
-                    <mah:NumericUpDown Grid.Row="9" Grid.Column="3" Maximum="120" Interval="8" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
-                    <mah:NumericUpDown Grid.Row="9" Grid.Column="4" Maximum="120" Interval="8" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
-                    
-                    <mah:NumericUpDown Grid.Row="10" Grid.Column="1" Value="1" Minimum="1" Maximum="31" Interval="2" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
-                    <mah:NumericUpDown Grid.Row="10" Grid.Column="2" Value="1" Minimum="1" Maximum="31" Interval="2" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
-                    <mah:NumericUpDown Grid.Row="10" Grid.Column="3" Value="1" Minimum="1" Maximum="31" Interval="2" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
-                    <mah:NumericUpDown Grid.Row="10" Grid.Column="4" Value="1" Minimum="1" Maximum="31" Interval="2" NumericInputMode="Numbers" ValueChanged="NumericUpDown_OnValueChanged"/>
-                    
-                    <ComboBox Grid.Row="11" Grid.Column="1" ItemsSource="{StaticResource EnabledOptions}" IsEnabled="False"/>
-                    <ComboBox Grid.Row="11" Grid.Column="2" ItemsSource="{StaticResource EnabledOptions}" IsEnabled="False"/>
-                    <ComboBox Grid.Row="11" Grid.Column="3" ItemsSource="{StaticResource EnabledOptions}" IsEnabled="False"/>
-                    <ComboBox Grid.Row="11" Grid.Column="4" ItemsSource="{StaticResource EnabledOptions}" IsEnabled="False"/>
-
-                    <StackPanel Grid.Row="0" Grid.Column="5" Orientation="Horizontal">
-                        <Label Content="AMS" ToolTip="Low Frequency oscillator" />
-                        <ComboBox SelectedIndex="0">
-                            <ComboBoxItem Content="0" />
-                            <ComboBoxItem Content="1.4" />
-                            <ComboBoxItem Content="5.9" />
-                            <ComboBoxItem Content="11.8" />
+                        <userControls:BetterLabel Grid.Row="2" Grid.Column="5" Content="Algorithm" Style="{StaticResource Header}" />
+                        <ComboBox Grid.Row="2" Grid.Column="6">
+                            <ComboBoxItem Content="0 (Out 4)" />
+                            <ComboBoxItem Content="1 (Out 4)" />
+                            <ComboBoxItem Content="2 (Out 4)" />
+                            <ComboBoxItem Content="3 (Out 4)" />
+                            <ComboBoxItem Content="4 (Out 2-4)" />
+                            <ComboBoxItem Content="5 (Out 2-3-4)" />
+                            <ComboBoxItem Content="6 (Out 2-3-4)" />
+                            <ComboBoxItem Content="7 (Out 1-2-3-4)" />
                         </ComboBox>
-                    </StackPanel>
-                    <StackPanel Grid.Row="0" Grid.Column="6" Orientation="Horizontal">
-                        <Label Content="FMS %" ToolTip="Low Frequency oscillator" />
-                        <ComboBox>
-                            <ComboBoxItem Content="0" />
-                            <ComboBoxItem Content="±3.4" />
-                            <ComboBoxItem Content="±6.7" />
-                            <ComboBoxItem Content="±10" />
-                            <ComboBoxItem Content="±14" />
-                            <ComboBoxItem Content="±20" />
-                            <ComboBoxItem Content="±40" />
-                            <ComboBoxItem Content="±80" />
-                        </ComboBox>
-                    </StackPanel>
-                    
-                    <Label Grid.Row="1" Grid.Column="5" Content="Feedback"/>
-                    <ComboBox Grid.Row="1" Grid.Column="6">
-                        <ComboBoxItem Content="Off" />
-                        <ComboBoxItem Content="Pi / 16" />
-                        <ComboBoxItem Content="Pi / 8" />
-                        <ComboBoxItem Content="Pi / 4" />
-                        <ComboBoxItem Content="Pi / 2" />
-                        <ComboBoxItem Content="Pi" />
-                        <ComboBoxItem Content="2 x Pi" />
-                        <ComboBoxItem Content="4 x Pi" />
-                    </ComboBox>
-                    
-                    <Label Grid.Row="2" Grid.Column="5" Content="Algorithm"/>
-                    <ComboBox Grid.Row="2" Grid.Column="6">
-                        <ComboBoxItem Content="0 (Out 4)" />
-                        <ComboBoxItem Content="1 (Out 4)" />
-                        <ComboBoxItem Content="2 (Out 4)" />
-                        <ComboBoxItem Content="3 (Out 4)" />
-                        <ComboBoxItem Content="4 (Out 2-4)" />
-                        <ComboBoxItem Content="5 (Out 2-3-4)" />
-                        <ComboBoxItem Content="6 (Out 2-3-4)" />
-                        <ComboBoxItem Content="7 (Out 1-2-3-4)" />
-                    </ComboBox>
-                    
-                    <Label Grid.Row="3" Grid.Column="5" Content="Transposition"/>
-                    <ComboBox Grid.Row="3" Grid.Column="6">
-                        <ComboBoxItem Content="0 (Default)" />
-                    </ComboBox>
 
-                    <StackPanel Grid.Row="4" Grid.Column="5" Orientation="Horizontal" />
-                </Grid>
-            </TabItem>
-            <TabItem Header="Pretty">
-                <Label Content="Boo" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-            </TabItem>
-        </TabControl>
-    </Grid>
+                        <userControls:BetterLabel Grid.Row="3" Grid.Column="5" Content="Transposition" Style="{StaticResource Header}" />
+                        <ComboBox Grid.Row="3" Grid.Column="6">
+                            <ComboBoxItem Content="0 (Default)" />
+                        </ComboBox>
+
+                        <userControls:BetterLabel Grid.Row="4" Grid.Column="5" Content="3X" Style="{StaticResource HexHeader}" />
+                        <Grid Grid.Row="5" Grid.Column="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <userControls:BetterLabel Grid.Column="0" Content="{Binding CurrentPatch.Registers[0]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="1" Content="{Binding CurrentPatch.Registers[1]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="2" Content="{Binding CurrentPatch.Registers[2]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="3" Content="{Binding CurrentPatch.Registers[3]}" Style="{StaticResource HexText}" />
+                        </Grid>
+
+                        <userControls:BetterLabel Grid.Row="4" Grid.Column="6" Content="4X" Style="{StaticResource HexHeader}" />
+                        <Grid Grid.Row="5" Grid.Column="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <userControls:BetterLabel Grid.Column="0" Content="{Binding CurrentPatch.Registers[4]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="1" Content="{Binding CurrentPatch.Registers[5]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="2" Content="{Binding CurrentPatch.Registers[6]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="3" Content="{Binding CurrentPatch.Registers[7]}" Style="{StaticResource HexText}" />
+                        </Grid>
+
+                        <userControls:BetterLabel Grid.Row="6" Grid.Column="5" Content="5X" Style="{StaticResource HexHeader}" />
+                        <Grid Grid.Row="7" Grid.Column="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <userControls:BetterLabel Grid.Column="0" Content="{Binding CurrentPatch.Registers[8]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="1" Content="{Binding CurrentPatch.Registers[9]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="2" Content="{Binding CurrentPatch.Registers[10]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="3" Content="{Binding CurrentPatch.Registers[11]}" Style="{StaticResource HexText}" />
+                        </Grid>
+
+                        <userControls:BetterLabel Grid.Row="6" Grid.Column="6" Content="6X" Style="{StaticResource HexHeader}" />
+                        <Grid Grid.Row="7" Grid.Column="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <userControls:BetterLabel Grid.Column="0" Content="{Binding CurrentPatch.Registers[12]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="1" Content="{Binding CurrentPatch.Registers[13]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="2" Content="{Binding CurrentPatch.Registers[14]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="3" Content="{Binding CurrentPatch.Registers[15]}" Style="{StaticResource HexText}" />
+                        </Grid>
+
+                        <userControls:BetterLabel Grid.Row="8" Grid.Column="5" Content="7X" Style="{StaticResource HexHeader}" />
+                        <Grid Grid.Row="9" Grid.Column="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <userControls:BetterLabel Grid.Column="0" Content="{Binding CurrentPatch.Registers[16]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="1" Content="{Binding CurrentPatch.Registers[17]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="2" Content="{Binding CurrentPatch.Registers[18]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="3" Content="{Binding CurrentPatch.Registers[19]}" Style="{StaticResource HexText}" />
+                        </Grid>
+
+                        <userControls:BetterLabel Grid.Row="8" Grid.Column="6" Content="8X" Style="{StaticResource HexHeader}" />
+                        <Grid Grid.Row="9" Grid.Column="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <userControls:BetterLabel Grid.Column="0" Content="{Binding CurrentPatch.Registers[20]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="1" Content="{Binding CurrentPatch.Registers[21]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="2" Content="{Binding CurrentPatch.Registers[22]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="3" Content="{Binding CurrentPatch.Registers[23]}" Style="{StaticResource HexText}" />
+                        </Grid>
+
+                        <userControls:BetterLabel Grid.Row="10" Grid.Column="5" Content="9X" Style="{StaticResource HexHeader}" />
+                        <Grid Grid.Row="11" Grid.Column="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <userControls:BetterLabel Grid.Column="0" Content="{Binding CurrentPatch.Registers[24]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="1" Content="{Binding CurrentPatch.Registers[25]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="2" Content="{Binding CurrentPatch.Registers[26]}" Style="{StaticResource HexText}" />
+                            <userControls:BetterLabel Grid.Column="3" Content="{Binding CurrentPatch.Registers[27]}" Style="{StaticResource HexText}" />
+                        </Grid>
+                        <CheckBox x:Name="HexEnabled" Grid.Row="10" Grid.Column="6" Content="Hex Mode" />
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Analog">
+                    <userControls:BetterLabel Content="Boo" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </DockPanel>
 </mah:MetroWindow>

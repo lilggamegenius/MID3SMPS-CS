@@ -6,20 +6,25 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using MahApps.Metro.Controls;
+using MID3SMPS.Containers;
+using MID3SMPS.Containers.Gyb;
 
 namespace MID3SMPS.Forms;
 
 // Added "YM" to 2612Edit since classes can't start with numbers
 public partial class Ym2612Edit{
+	private readonly List<Line> _lines = new();
+
 	private readonly MainWindow _mainWindow;
-	private readonly List<Line> lines = new();
+	private int _curXScale = 0;
+	private ushort _renderPosition;
 	public WriteableBitmap? Bitmap;
-	private int curXScale = 0;
 	public bool IsClosed;
-	private ushort renderPosition;
-	public Matrix transformToDevice;
 
 	public Ym2612Edit(){
+		// ReSharper disable once AssignNullToNotNullAttribute
+		_mainWindow = (MainWindow)Application.Current.MainWindow;
+		CurrentPatch = _mainWindow.Mappings.Gyb.Patches[2];
 		InitializeComponent();
 		IsClosed = false;
 		Closed += OnClosed;
@@ -28,56 +33,64 @@ public partial class Ym2612Edit{
 							  CompositionTarget.Rendering += UpdateOsc;
 						  },
 						  DispatcherPriority.Render);
-		// ReSharper disable once AssignNullToNotNullAttribute
-		_mainWindow = (MainWindow)Application.Current.MainWindow;
 	}
+
+	public Patch CurrentPatch{get;set;}
+	public bool IsHex{get;set;}
+
+	public Mappings Mappings=>_mainWindow.Mappings;
 	private void OnClosed(object? sender, EventArgs? args){IsClosed = true;}
 
 	private void UpdateOsc(object? sender, EventArgs e){
+		if(!Oscilloscope.IsLoaded) return;
 		for(int i = 0; i < 100; i++){
-			CreateLine(MathF.Sin(renderPosition));
+			CreateLine(Math.Sin(_renderPosition / (Oscilloscope.ActualWidth / 25)));
 		}
 	}
 
-	private Line CreateLine(float value){
+	private Line CreateLine(double value){
 		Line line;
-		if(renderPosition >= lines.Count){
+		if(_renderPosition >= _lines.Count){
 			line = new Line();
-			lines.Add(line);
+			_lines.Add(line);
 			Oscilloscope.Children.Add(line);
 		} else{
-			line = lines[renderPosition];
+			line = _lines[_renderPosition];
 		}
 
 		const double offset = 1;
 		double yScale = Oscilloscope.ActualHeight / 2;
 		int xScale = (int)Oscilloscope.ActualWidth;
-		if(curXScale == 0) curXScale = xScale;
+		if(_curXScale == 0) _curXScale = xScale;
 		line.Stroke = Brushes.Lime;
 		line.Visibility = Visibility.Visible;
-		if(renderPosition == 0){
-			line.X1 = line.X2 = renderPosition;
+		if(_renderPosition == 0){
+			line.X1 = line.X2 = _renderPosition;
 			line.Y1 = line.Y2 = (value + offset) * yScale;
 		} else{
-			line.X1 = renderPosition - 1;
-			line.Y1 = lines[renderPosition - 1].Y2;
-			line.X2 = renderPosition;
+			line.X1 = _renderPosition - 1;
+			line.Y1 = _lines[_renderPosition - 1].Y2;
+			line.X2 = _renderPosition;
 			line.Y2 = (value + offset) * yScale;
 		}
 
-		if(xScale >= curXScale){
-			if(lines.Count > curXScale){
-				for(int i = curXScale; i < xScale; i++){
-					if(lines.Count <= i) break;
-					lines[i].Visibility = Visibility.Hidden;
+		if(xScale >= _curXScale){
+			if(_lines.Count > _curXScale){
+				for(int i = _curXScale; i < xScale; i++){
+					if(_lines.Count <= i) break;
+					_lines[i].Visibility = Visibility.Hidden;
 				}
-				//lines.RemoveRange(renderPosition, lines.Count - renderPosition);
 			}
 		}
 
-		curXScale = xScale;
-		renderPosition++;
-		if(renderPosition >= xScale) renderPosition = 0;
+		_curXScale = xScale;
+		_renderPosition++;
+		if(_renderPosition >= xScale){
+			Oscilloscope.Children.RemoveRange(_renderPosition, _lines.Count - _renderPosition);
+			_lines.RemoveRange(_renderPosition, _lines.Count                - _renderPosition);
+			_renderPosition = 0;
+		}
+
 		return line;
 	}
 	private void NumericUpDown_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double?> e){

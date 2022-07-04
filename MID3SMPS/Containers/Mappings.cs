@@ -6,10 +6,10 @@ using MID3SMPS.Containers.Gyb;
 namespace MID3SMPS.Containers;
 
 public struct Mappings{
-	public readonly GYB Gyb;
-	public readonly DacMap DacMap;
-	public readonly DacList DacList;
-	public readonly PsgList PsgList;
+	public GYB Gyb{get;}
+	public DacMap DacMap{get;}
+	public DacList DacList{get;}
+	public PsgList PsgList{get;}
 
 	public readonly FileInfo gybPath;
 	public readonly FileInfo dacMapPath;

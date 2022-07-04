@@ -5,8 +5,8 @@ using System.IO;
 namespace MID3SMPS.Containers.Gyb;
 
 public class GYB{
-	public readonly List<Patch> Patches = new();
 	private sbyte defaultLFOSpeed;
+	public List<Patch> Patches{get;} = new();
 
 	public static GYB LoadGYB(FileInfo path){
 		Span<byte> gybData = File.ReadAllBytes(path.FullName);
