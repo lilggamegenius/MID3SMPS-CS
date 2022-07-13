@@ -10,6 +10,9 @@
                  Loaded="MainWindowLoaded"
                  Icon="/MID3SMPS;component/Resources/Icons/mid3smps.ico"
                  Title="MID --> SMPS" Height="320" Width="320" MinHeight="250" MinWidth="260">
+    <Window.DataContext>
+        <Binding RelativeSource="{RelativeSource Self}" />
+    </Window.DataContext>
     <Window.CommandBindings>
         <CommandBinding Command="local:WindowCommands.OpenMidi" CanExecute="OpenCommand_CanExecute" Executed="OpenCommand_Executed" />
         <CommandBinding Command="local:WindowCommands.SaveSmps" CanExecute="SaveCommand_CanExecute" Executed="SaveCommand_Executed" />
@@ -38,11 +41,12 @@
             </MenuItem>
             <MenuItem x:Name="ExtrasMenuItem" Header="_Extras">
                 <MenuItem x:Name="TempoCalculatorItem" Command="local:WindowCommands.TempoCalculator"/>
-                <MenuItem x:Name="ConvertSongTitleItem" Header="Convert Song _Title" IsCheckable="true" IsChecked="False" Checked="Unimplemented_Checked" Unchecked="Unimplemented_Unchecked"/>
-                <MenuItem x:Name="S2RModeItem" Header="S2_R Mode" IsCheckable="true" IsChecked="False" Checked="Unimplemented_Checked" Unchecked="Unimplemented_Unchecked"/>
-                <MenuItem x:Name="PwmModeItem" Header="P_WM Mode" IsCheckable="true" IsChecked="False" Checked="Unimplemented_Checked" Unchecked="Unimplemented_Unchecked"/>
-                <MenuItem x:Name="PerFileInstrumentsItem" Header="_Per File Instruments" IsCheckable="true" IsChecked="False" Checked="Unimplemented_Checked" Unchecked="Unimplemented_Unchecked"/>
-                <MenuItem x:Name="AutoReloadMidiItem" Header="_Auto Reload MIDI" IsCheckable="true" IsChecked="False" Checked="Unimplemented_Checked" Unchecked="Unimplemented_Unchecked"/>
+                <MenuItem x:Name="ConvertSongTitleItem" Header="Convert Song _Title" IsCheckable="true" IsChecked="False"/>
+                <MenuItem x:Name="S2RModeItem" Header="S2_R Mode" IsCheckable="true" IsChecked="False"/>
+                <MenuItem x:Name="PwmModeItem" Header="P_WM Mode" IsCheckable="true" IsChecked="False"/>
+                <MenuItem x:Name="PerFileInstrumentsItem" Header="_Per File Instruments" IsCheckable="true" IsChecked="False"/>
+                <MenuItem x:Name="AutoReloadMidiItem" Header="_Auto Reload MIDI" IsCheckable="true" IsChecked="False"/>
+                <MenuItem x:Name="AutoOptimizeMidi" Header="Auto _Optimize MIDI" IsCheckable="true" IsChecked="False"/>
             </MenuItem>
         </Menu>
         <StatusBar DockPanel.Dock="Bottom">

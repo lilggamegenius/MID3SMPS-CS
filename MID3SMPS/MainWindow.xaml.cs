@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Win32;
@@ -61,10 +62,10 @@ public partial class MainWindow{
 		OpnDll.PlayDACSample(0, (uint)sampleData.Length, sampleData, 0);
 	}
 
-	private void Load(FileInfo path){
-		Mappings = new Mappings(path);
-		LoadedBankTextBox.Text = Mappings.gybPath.Name;
-		LoadedBankTextBox.ToolTip = Mappings.gybPath.FullName;
+	private async Task LoadMappings(FileInfo path){
+		await Task.Run(()=>{Mappings = new Mappings(path);});
+		LoadedBankTextBox.Text = Mappings.Gyb.Path?.Name;
+		LoadedBankTextBox.ToolTip = Mappings.Gyb.Path?.FullName;
 		Status.Text = "Configuration Loaded";
 		MainSettings.Default.LastMappingFile = Mappings.path.FullName;
 	}
@@ -75,8 +76,6 @@ public partial class MainWindow{
 						MessageBoxButton.OK,
 						MessageBoxImage.Error);
 	}
-	private void Unimplemented_Checked(object sender, RoutedEventArgs e){}
-	private void Unimplemented_Unchecked(object sender, RoutedEventArgs e){}
 	private void OpenCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
 	private void SaveCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
 	private void OpenMappingsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
@@ -97,7 +96,7 @@ public partial class MainWindow{
 			DefaultExt = "cfg"
 		};
 		if(fileDialog.ShowDialog() != true) return;
-		Load(new FileInfo(fileDialog.FileName));
+		LoadMappings(new FileInfo(fileDialog.FileName));
 	}
 	private void SaveMappingsCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 	private void OpenInstrumentEditorCommand_Executed(object sender, ExecutedRoutedEventArgs e){
@@ -124,7 +123,7 @@ public partial class MainWindow{
 	private void OnClosing(object sender, CancelEventArgs e){MainSettings.Default.Save();}
 	private void MainWindowLoaded(object sender, RoutedEventArgs e){
 		if(string.IsNullOrWhiteSpace(MainSettings.Default.LastMappingFile)) return;
-		Load(new FileInfo(MainSettings.Default.LastMappingFile));
+		LoadMappings(new FileInfo(MainSettings.Default.LastMappingFile));
 		ConvertSongTitleItem.IsChecked = MainSettings.Default.ConvertSongTitle;
 		S2RModeItem.IsChecked = MainSettings.Default.S2RMode;
 		PwmModeItem.IsChecked = MainSettings.Default.PwmMode;

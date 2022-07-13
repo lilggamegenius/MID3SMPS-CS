@@ -6,30 +6,36 @@ namespace MID3SMPS.Containers.Gyb;
 
 public class GYB{
 	private sbyte defaultLFOSpeed;
+	[NonSerialized] public FileInfo? Path;
+
+	public GYB(){}
+
+	public GYB(FileInfo path){
+		Path = path;
+		Span<byte> gybData = File.ReadAllBytes(Path.FullName);
+		if(gybData[0] != 26 || gybData[1] != 12) throw new FormatException("Not a valid GYB formatted file");
+		byte version = gybData[2];
+		switch(version){
+			case 1:
+				LoadV1(gybData);
+				break;
+			case 2:
+				LoadV2(gybData);
+				break;
+			case 3:
+				LoadV3(gybData);
+				break;
+			case var _: throw new FormatException("Not a valid GYB formatted file");
+		}
+	}
 	public List<Patch> Patches{get;} = new();
 
-	public static GYB LoadGYB(FileInfo path){
-		Span<byte> gybData = File.ReadAllBytes(path.FullName);
-		if(gybData[0] != 26 || gybData[1] != 12) throw new FormatException("Not a valid GYB formatted file");
-		GYB gyb = new();
-		byte version = gybData[2];
-		return version switch{
-			1=>LoadV1(gyb, gybData),
-			2=>LoadV2(gyb, gybData),
-			3=>LoadV3(gyb, gybData),
-			var _=>throw new FormatException("Not a valid GYB formatted file")
-		};
-	}
+	private void LoadV1(Span<byte> gybData){}
 
-	private static GYB LoadV1(GYB gyb, Span<byte> gybData){return gyb;}
+	private void LoadV2(Span<byte> gybData){defaultLFOSpeed = (sbyte)gybData[105];}
 
-	private static GYB LoadV2(GYB gyb, Span<byte> gybData){
-		gyb.defaultLFOSpeed = (sbyte)gybData[105];
-		return gyb;
-	}
-
-	private static GYB LoadV3(GYB gyb, Span<byte> gybData){
-		gyb.defaultLFOSpeed = (sbyte)gybData[3];
+	private void LoadV3(Span<byte> gybData){
+		defaultLFOSpeed = (sbyte)gybData[3];
 		uint filesize = BitConverter.ToUInt32(gybData[0x4..]);
 		if(filesize != gybData.Length) throw new FormatException("Not a valid GYB formatted file");
 		uint bankOffset = BitConverter.ToUInt32(gybData[0x8..]);
@@ -41,11 +47,9 @@ public class GYB{
 			var patch = new Patch(3,
 								  gybData.Slice((int)currentOffset + 2,
 												instrumentSize));
-			gyb.Patches.Add(patch);
+			Patches.Add(patch);
 			currentOffset += instrumentSize;
 		}
-
-		return gyb;
 	}
 }
 

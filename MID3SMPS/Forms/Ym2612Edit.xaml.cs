@@ -7,7 +7,6 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using MahApps.Metro.Controls;
 using MID3SMPS.Containers;
-using MID3SMPS.Containers.Gyb;
 
 namespace MID3SMPS.Forms;
 
@@ -16,7 +15,7 @@ public partial class Ym2612Edit{
 	private readonly List<Line> _lines = new();
 
 	private readonly MainWindow _mainWindow;
-	private int _curXScale = 0;
+	private int _curXScale;
 	private ushort _renderPosition;
 	public WriteableBitmap? Bitmap;
 	public bool IsClosed;
@@ -24,7 +23,6 @@ public partial class Ym2612Edit{
 	public Ym2612Edit(){
 		// ReSharper disable once AssignNullToNotNullAttribute
 		_mainWindow = (MainWindow)Application.Current.MainWindow;
-		CurrentPatch = _mainWindow.Mappings.Gyb.Patches[2];
 		InitializeComponent();
 		IsClosed = false;
 		Closed += OnClosed;
@@ -35,7 +33,6 @@ public partial class Ym2612Edit{
 						  DispatcherPriority.Render);
 	}
 
-	public Patch CurrentPatch{get;set;}
 	public bool IsHex{get;set;}
 
 	public Mappings Mappings=>_mainWindow.Mappings;
