@@ -8,16 +8,13 @@
         <Setting Name="ConvertSongTitle" Type="System.Boolean" Scope="User">
             <Value Profile="(Default)">False</Value>
         </Setting>
-        <Setting Name="S2RMode" Type="System.Boolean" Scope="User">
-            <Value Profile="(Default)">False</Value>
-        </Setting>
-        <Setting Name="PwmMode" Type="System.Boolean" Scope="User">
-            <Value Profile="(Default)">False</Value>
-        </Setting>
         <Setting Name="PerFileInstruments" Type="System.Boolean" Scope="User">
-            <Value Profile="(Default)">False</Value>
+            <Value Profile="(Default)">True</Value>
         </Setting>
         <Setting Name="AutoReloadMidi" Type="System.Boolean" Scope="User">
+            <Value Profile="(Default)">False</Value>
+        </Setting>
+        <Setting Name="AutoOptimizeMidi" Type="System.Boolean" Scope="User">
             <Value Profile="(Default)">False</Value>
         </Setting>
     </Settings>

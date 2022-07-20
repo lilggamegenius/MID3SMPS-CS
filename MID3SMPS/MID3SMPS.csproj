@@ -66,4 +66,10 @@
         <Resource Include="Resources\Icons\2612edit transparent.ico"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Reference Include="Midi">
+            <HintPath>E:\workspace\MidiSlicer\Midi\bin\Debug\net5.0\Midi.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
 </Project>

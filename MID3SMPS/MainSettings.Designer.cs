@@ -49,31 +49,7 @@ namespace MID3SMPS {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool S2RMode {
-            get {
-                return ((bool)(this["S2RMode"]));
-            }
-            set {
-                this["S2RMode"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool PwmMode {
-            get {
-                return ((bool)(this["PwmMode"]));
-            }
-            set {
-                this["PwmMode"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool PerFileInstruments {
             get {
                 return ((bool)(this["PerFileInstruments"]));
@@ -92,6 +68,18 @@ namespace MID3SMPS {
             }
             set {
                 this["AutoReloadMidi"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AutoOptimizeMidi {
+            get {
+                return ((bool)(this["AutoOptimizeMidi"]));
+            }
+            set {
+                this["AutoOptimizeMidi"] = value;
             }
         }
     }

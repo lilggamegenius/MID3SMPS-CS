@@ -41,12 +41,10 @@
             </MenuItem>
             <MenuItem x:Name="ExtrasMenuItem" Header="_Extras">
                 <MenuItem x:Name="TempoCalculatorItem" Command="local:WindowCommands.TempoCalculator"/>
-                <MenuItem x:Name="ConvertSongTitleItem" Header="Convert Song _Title" IsCheckable="true" IsChecked="False"/>
-                <MenuItem x:Name="S2RModeItem" Header="S2_R Mode" IsCheckable="true" IsChecked="False"/>
-                <MenuItem x:Name="PwmModeItem" Header="P_WM Mode" IsCheckable="true" IsChecked="False"/>
-                <MenuItem x:Name="PerFileInstrumentsItem" Header="_Per File Instruments" IsCheckable="true" IsChecked="False"/>
-                <MenuItem x:Name="AutoReloadMidiItem" Header="_Auto Reload MIDI" IsCheckable="true" IsChecked="False"/>
-                <MenuItem x:Name="AutoOptimizeMidi" Header="Auto _Optimize MIDI" IsCheckable="true" IsChecked="False"/>
+                <MenuItem x:Name="ConvertSongTitleItem" Header="Convert Song _Title" IsCheckable="true" IsChecked="False" Checked="ConvertSongTitleItem_OnChecked"/>
+                <MenuItem x:Name="PerFileInstrumentsItem" Header="_Per File Instruments" IsCheckable="true" IsChecked="False" Checked="PerFileInstrumentsItem_OnChecked"/>
+                <MenuItem x:Name="AutoReloadMidiItem" Header="_Auto Reload MIDI" IsCheckable="true" IsChecked="False" Checked="AutoReloadMidiItem_OnChecked"/>
+                <MenuItem x:Name="AutoOptimizeMidiItem" Header="Auto _Optimize MIDI" IsCheckable="true" IsChecked="False" Checked="AutoOptimizeMidi_OnChecked"/>
             </MenuItem>
         </Menu>
         <StatusBar DockPanel.Dock="Bottom">

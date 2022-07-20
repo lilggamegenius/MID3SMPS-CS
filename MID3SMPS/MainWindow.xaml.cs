@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using M;
 using Microsoft.Win32;
 using MID3SMPS.Containers;
 using MID3SMPS.Forms;
@@ -16,7 +18,10 @@ namespace MID3SMPS;
 /// </summary>
 public partial class MainWindow{
 	public Ym2612Edit? EditWindow;
+	public DateTime LastMidiWrite;
 	public Mappings Mappings;
+	public MidiFile Midi;
+	public FileInfo? MidiPath;
 
 	public MainWindow(){
 		InitializeComponent();
@@ -70,6 +75,209 @@ public partial class MainWindow{
 		MainSettings.Default.LastMappingFile = Mappings.path.FullName;
 	}
 
+	private async Task LoadMidi(FileInfo fileInfo){
+		MidiPath = fileInfo;
+		await Task.Run(()=>{Midi = MidiFile.ReadFrom(MidiPath.OpenRead());});
+		LoadedMidiTextBox.Text = MidiPath.Name;
+		MidiNumber.Text = Midi.TimeBase.ToString();
+		Status.Text = $"Loaded Midi {Midi.Name}";
+		LastMidiWrite = MidiPath.LastWriteTime;
+		var watch = new Stopwatch();
+		watch.Start();
+		await OptimizeMidi().ConfigureAwait(false);
+		watch.Stop();
+		Status.Text = $"Midi optimized in {watch.ElapsedMilliseconds} ms";
+	}
+
+	private async Task OptimizeMidi(){
+		if(!AutoOptimizeMidiItem.IsChecked) return;
+		List<MidiSequence> FMTracks = new(6);
+		List<MidiSequence> PSGTracks = new(4);
+		List<MidiSequence> DrumTracks = new(); // "it's a surprise tool that help us later"
+		await Parallel.ForEachAsync(Midi.Tracks,
+									async (midiSequence, _)=>{
+										await Task.Run(()=>{
+														   for(int i = 0; i < 10; i++){
+															   if(i < 6){
+																   FMTracks.Add(new MidiSequence());
+																   foreach(MidiEvent? midiEvent in midiSequence.GetEventsByChannel((MidiChannels)(1 << i))){
+																	   if(midiEvent == null) continue;
+																	   FMTracks[i].Events.Add(midiEvent);
+																   }
+
+																   continue;
+															   }
+
+															   PSGTracks.Add(new MidiSequence());
+															   foreach(MidiEvent? midiEvent in midiSequence.GetEventsByChannel((MidiChannels)(1 << (i + 4)))){
+																   if(midiEvent == null) continue;
+																   PSGTracks[i - 6].Events.Add(midiEvent);
+															   }
+														   }
+
+														   var drumTrack = new MidiSequence();
+														   foreach(MidiEvent? midiEvent in midiSequence.GetEventsByChannel(MidiChannels.Channel9)){
+															   if(midiEvent == null) continue;
+															   drumTrack.Events.Add(midiEvent);
+														   }
+
+														   if(drumTrack.Events.Count != 0) DrumTracks.Add(drumTrack);
+													   },
+													   _);
+									});
+		DrumTracks.Sort((a, b)=>string.Compare(a.Name, b.Name, StringComparison.CurrentCulture));
+		int count = 10 + DrumTracks.Count;
+		Task[] tasks = new Task[count];
+		for(int i = 0; i < count; i++){
+			tasks[i] = i switch{
+				<= 5=>OptimizeTrack(i, FMTracks[i]),
+				> 5 and <= 9=>OptimizeTrack(i, PSGTracks[i - 6]),
+				> 9=>OptimizeTrack(i, DrumTracks[i         - 10])
+			};
+		}
+
+		try{
+			Task.WaitAll(tasks);
+		} catch(AggregateException e){
+			throw;
+		}
+	}
+
+	/*
+	 * Order for events in optimized midi
+	 *
+	 * Note Offs
+	 * Bank Select MSB, LSB
+	 * instrument change
+	 * Volume
+	 * Pan
+	 * Expression
+	 * other CCs
+	 * Pitch Bend Range (RPN MSB, LSB, Data Entry)
+	 * Pitch Bend
+	 * Loop Control (111)
+	 * Note Ons
+	 */
+	private async Task OptimizeTrack(int trackId, MidiSequence track){
+		if(track.Events.Count == 0) return;
+		var watch = new Stopwatch();
+		watch.Start();
+		await Task.Run(()=>{
+			List<MidiEvent> events = new(track.Events);
+			track.Events.Clear();
+			int currentPos = events[0].Position; // In case this track's first event isn't on 0
+			var trackFrame = new TrackFrame();
+			int delta = currentPos;
+			for(int i = 0; i < events.Count; i++){
+				if(events[i].Position > 0){ // Apply changes in the correct order
+					MessagesToEvents(track.Events, trackFrame.NotesOffs, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.BankMsb, trackFrame.PreviousFrame?.BankMsb, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.BankLsb, trackFrame.PreviousFrame?.BankLsb, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.InsChange, trackFrame.PreviousFrame?.InsChange, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.VolumeMsb, trackFrame.PreviousFrame?.VolumeMsb, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.VolumeLsb, trackFrame.PreviousFrame?.VolumeLsb, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.PanMsb, trackFrame.PreviousFrame?.PanMsb, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.PanLsb, trackFrame.PreviousFrame?.PanLsb, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.ExpressionMsb, trackFrame.PreviousFrame?.ExpressionMsb, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.ExpressionLsb, trackFrame.PreviousFrame?.ExpressionLsb, ref delta);
+					MessagesToEvents(track.Events, trackFrame.OtherCCs, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.RpnMsb, trackFrame.PreviousFrame?.RpnMsb, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.RpnLsb, trackFrame.PreviousFrame?.RpnLsb, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.DataEntryMsb, trackFrame.PreviousFrame?.DataEntryMsb, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.DataEntryLsb, trackFrame.PreviousFrame?.DataEntryLsb, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.Pitch, trackFrame.PreviousFrame?.Pitch, ref delta);
+					AddMessageIfNotChanged(track.Events, trackFrame.Loop, trackFrame.PreviousFrame?.Loop, ref delta);
+					MessagesToEvents(track.Events, trackFrame.NoteOns, ref delta);
+					delta += events[i].Position;
+					currentPos += events[i].Position; // Apparently midi files use deltas instead of absolute position
+					Debug.WriteLine($"Track({trackId}), Delta({delta}), Position({currentPos})");
+					trackFrame = new TrackFrame(trackFrame);
+				}
+
+				switch(events[i].Message){
+					case MidiMessageMeta meta:
+						if(trackFrame.MetaSet.Contains(meta)) trackFrame.MetaSet.Remove(meta);
+						trackFrame.MetaSet.Add(meta);
+						continue;
+					case MidiMessagePatchChange patchChange:
+						trackFrame.InsChange = patchChange;
+						continue;
+					case MidiMessageChannelPitch pitch:
+						trackFrame.Pitch = pitch;
+						continue;
+					case MidiMessageNoteOn noteOn:
+						trackFrame.NoteOns.Add(noteOn);
+						continue;
+					case MidiMessageNoteOff noteOff:
+						trackFrame.NotesOffs.Add(noteOff);
+						continue;
+					case MidiMessageCC cc:
+						const int lsbOffset = 32;
+						switch(cc.ControlId){
+							case 0:
+								trackFrame.BankMsb = cc;
+								continue;
+							case 0 + lsbOffset:
+								trackFrame.BankLsb = cc;
+								continue;
+							case 7:
+								trackFrame.VolumeMsb = cc;
+								continue;
+							case 7 + lsbOffset:
+								trackFrame.VolumeLsb = cc;
+								continue;
+							case 10:
+								trackFrame.PanMsb = cc;
+								continue;
+							case 10 + lsbOffset:
+								trackFrame.PanLsb = cc;
+								continue;
+							case 11:
+								trackFrame.ExpressionMsb = cc;
+								continue;
+							case 11 + lsbOffset:
+								trackFrame.ExpressionLsb = cc;
+								continue;
+							default: // Any other CC
+								trackFrame.OtherCCs.Add(cc);
+								continue;
+							case 101:
+								trackFrame.RpnMsb = cc;
+								continue;
+							case 100:
+								trackFrame.RpnLsb = cc;
+								continue;
+							case 6:
+								trackFrame.DataEntryMsb = cc;
+								continue;
+							case 6 + lsbOffset:
+								trackFrame.DataEntryLsb = cc;
+								continue;
+							case 111:
+								trackFrame.Loop = cc;
+								continue;
+						}
+				}
+			}
+		});
+		watch.Stop();
+		Debug.WriteLine($"Track {trackId} took {watch.ElapsedMilliseconds} ms to optimize");
+	}
+
+	private static void MessagesToEvents(ICollection<MidiEvent> events, IEnumerable<MidiMessage> messages, ref int delta){
+		foreach(MidiMessage message in messages){
+			events.Add(new MidiEvent(delta, message));
+			delta = 0;
+		}
+	}
+
+	private static void AddMessageIfNotChanged(ICollection<MidiEvent> events, MidiMessage? newMessage, MidiMessage? oldMessage, ref int delta){
+		if(newMessage == null) return;
+		if(Equals(newMessage, oldMessage)) return; // Make sure the new message isn't simply a duplicate of the old value
+		events.Add(new MidiEvent(delta, newMessage));
+		delta = 0;
+	}
+
 	private void Unimplemented(object sender, EventArgs e){
 		MessageBox.Show("Sorry, That action hasn't been implemented yet",
 						"Unimplemented Action",
@@ -85,7 +293,18 @@ public partial class MainWindow{
 	private void TempoCalculatorCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
 	private void LoadInsLibCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
 	private void QuickConvertCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
-	private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
+	private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e){
+		OpenFileDialog fileDialog = new(){
+			AddExtension = true,
+			CheckFileExists = true,
+			CheckPathExists = true,
+			Filter = "MIDI files (*.mid)|*.mid;*.midi",
+			DefaultExt = "mid",
+		};
+		if(MidiPath                != null) fileDialog.FileName = MidiPath.Name;
+		if(fileDialog.ShowDialog() != true) return;
+		LoadMidi(new FileInfo(fileDialog.FileName));
+	}
 	private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 	private void OpenMappingsCommand_Executed(object sender, ExecutedRoutedEventArgs e){
 		OpenFileDialog fileDialog = new(){
@@ -121,13 +340,28 @@ public partial class MainWindow{
 	private void LoadInsLibCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 	private void QuickConvertCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 	private void OnClosing(object sender, CancelEventArgs e){MainSettings.Default.Save();}
-	private void MainWindowLoaded(object sender, RoutedEventArgs e){
+	private async void MainWindowLoaded(object sender, RoutedEventArgs e){
 		if(string.IsNullOrWhiteSpace(MainSettings.Default.LastMappingFile)) return;
-		LoadMappings(new FileInfo(MainSettings.Default.LastMappingFile));
+		await LoadMappings(new FileInfo(MainSettings.Default.LastMappingFile));
 		ConvertSongTitleItem.IsChecked = MainSettings.Default.ConvertSongTitle;
-		S2RModeItem.IsChecked = MainSettings.Default.S2RMode;
-		PwmModeItem.IsChecked = MainSettings.Default.PwmMode;
 		PerFileInstrumentsItem.IsChecked = MainSettings.Default.PerFileInstruments;
 		AutoReloadMidiItem.IsChecked = MainSettings.Default.AutoReloadMidi;
+		AutoOptimizeMidiItem.IsChecked = MainSettings.Default.AutoOptimizeMidi;
+	}
+	private void ConvertSongTitleItem_OnChecked(object sender, RoutedEventArgs e){
+		MainSettings.Default.ConvertSongTitle = ConvertSongTitleItem.IsChecked;
+		e.Handled = true;
+	}
+	private void PerFileInstrumentsItem_OnChecked(object sender, RoutedEventArgs e){
+		MainSettings.Default.PerFileInstruments = PerFileInstrumentsItem.IsChecked;
+		e.Handled = true;
+	}
+	private void AutoReloadMidiItem_OnChecked(object sender, RoutedEventArgs e){
+		MainSettings.Default.AutoReloadMidi = AutoReloadMidiItem.IsChecked;
+		e.Handled = true;
+	}
+	private void AutoOptimizeMidi_OnChecked(object sender, RoutedEventArgs e){
+		MainSettings.Default.AutoOptimizeMidi = AutoOptimizeMidiItem.IsChecked;
+		e.Handled = true;
 	}
 }
