@@ -80,67 +80,23 @@ public partial class MainWindow{
 		await Task.Run(()=>{Midi = MidiFile.ReadFrom(MidiPath.OpenRead());});
 		LoadedMidiTextBox.Text = MidiPath.Name;
 		MidiNumber.Text = Midi.TimeBase.ToString();
-		Status.Text = $"Loaded Midi {Midi.Name}";
+		Status.Text = $"Loaded Midi {Midi.Name}{(AutoOptimizeMidiItem.IsChecked ? " - Optimizing..." : string.Empty)}";
 		LastMidiWrite = MidiPath.LastWriteTime;
-		var watch = new Stopwatch();
-		watch.Start();
-		await OptimizeMidi().ConfigureAwait(false);
-		watch.Stop();
-		Status.Text = $"Midi optimized in {watch.ElapsedMilliseconds} ms";
+		await OptimizeMidi();
 	}
 
 	private async Task OptimizeMidi(){
 		if(!AutoOptimizeMidiItem.IsChecked) return;
-		List<MidiSequence> FMTracks = new(6);
-		List<MidiSequence> PSGTracks = new(4);
-		List<MidiSequence> DrumTracks = new(); // "it's a surprise tool that help us later"
-		await Parallel.ForEachAsync(Midi.Tracks,
-									async (midiSequence, _)=>{
-										await Task.Run(()=>{
-														   for(int i = 0; i < 10; i++){
-															   if(i < 6){
-																   FMTracks.Add(new MidiSequence());
-																   foreach(MidiEvent? midiEvent in midiSequence.GetEventsByChannel((MidiChannels)(1 << i))){
-																	   if(midiEvent == null) continue;
-																	   FMTracks[i].Events.Add(midiEvent);
-																   }
-
-																   continue;
-															   }
-
-															   PSGTracks.Add(new MidiSequence());
-															   foreach(MidiEvent? midiEvent in midiSequence.GetEventsByChannel((MidiChannels)(1 << (i + 4)))){
-																   if(midiEvent == null) continue;
-																   PSGTracks[i - 6].Events.Add(midiEvent);
-															   }
-														   }
-
-														   var drumTrack = new MidiSequence();
-														   foreach(MidiEvent? midiEvent in midiSequence.GetEventsByChannel(MidiChannels.Channel9)){
-															   if(midiEvent == null) continue;
-															   drumTrack.Events.Add(midiEvent);
-														   }
-
-														   if(drumTrack.Events.Count != 0) DrumTracks.Add(drumTrack);
-													   },
-													   _);
-									});
-		DrumTracks.Sort((a, b)=>string.Compare(a.Name, b.Name, StringComparison.CurrentCulture));
-		int count = 10 + DrumTracks.Count;
-		Task[] tasks = new Task[count];
-		for(int i = 0; i < count; i++){
-			tasks[i] = i switch{
-				<= 5=>OptimizeTrack(i, FMTracks[i]),
-				> 5 and <= 9=>OptimizeTrack(i, PSGTracks[i - 6]),
-				> 9=>OptimizeTrack(i, DrumTracks[i         - 10])
-			};
+		var watch = new Stopwatch();
+		watch.Start();
+		List<Task> trackOptimizers = new();
+		for(int i = 0; i < Midi.Tracks.Count; i++){
+			trackOptimizers.Add(OptimizeTrack(i, Midi.Tracks[i]));
 		}
 
-		try{
-			Task.WaitAll(tasks);
-		} catch(AggregateException e){
-			throw;
-		}
+		await Task.WhenAll(trackOptimizers);
+		watch.Stop();
+		Status.Text = $"Midi optimized in {watch.ElapsedMilliseconds} ms";
 	}
 
 	/*
@@ -158,7 +114,7 @@ public partial class MainWindow{
 	 * Loop Control (111)
 	 * Note Ons
 	 */
-	private async Task OptimizeTrack(int trackId, MidiSequence track){
+	private static async Task OptimizeTrack(int trackId, MidiSequence track){
 		if(track.Events.Count == 0) return;
 		var watch = new Stopwatch();
 		watch.Start();
@@ -168,8 +124,8 @@ public partial class MainWindow{
 			int currentPos = events[0].Position; // In case this track's first event isn't on 0
 			var trackFrame = new TrackFrame();
 			int delta = currentPos;
-			for(int i = 0; i < events.Count; i++){
-				if(events[i].Position > 0){ // Apply changes in the correct order
+			foreach(MidiEvent msg in events){
+				if(msg.Position > 0){ // Apply changes in the correct order
 					MessagesToEvents(track.Events, trackFrame.NotesOffs, ref delta);
 					AddMessageIfNotChanged(track.Events, trackFrame.BankMsb, trackFrame.PreviousFrame?.BankMsb, ref delta);
 					AddMessageIfNotChanged(track.Events, trackFrame.BankLsb, trackFrame.PreviousFrame?.BankLsb, ref delta);
@@ -188,13 +144,13 @@ public partial class MainWindow{
 					AddMessageIfNotChanged(track.Events, trackFrame.Pitch, trackFrame.PreviousFrame?.Pitch, ref delta);
 					AddMessageIfNotChanged(track.Events, trackFrame.Loop, trackFrame.PreviousFrame?.Loop, ref delta);
 					MessagesToEvents(track.Events, trackFrame.NoteOns, ref delta);
-					delta += events[i].Position;
-					currentPos += events[i].Position; // Apparently midi files use deltas instead of absolute position
+					delta += msg.Position;
+					currentPos += msg.Position; // Apparently midi files use deltas instead of absolute position
 					Debug.WriteLine($"Track({trackId}), Delta({delta}), Position({currentPos})");
 					trackFrame = new TrackFrame(trackFrame);
 				}
 
-				switch(events[i].Message){
+				switch(msg.Message){
 					case MidiMessageMeta meta:
 						if(trackFrame.MetaSet.Contains(meta)) trackFrame.MetaSet.Remove(meta);
 						trackFrame.MetaSet.Add(meta);
@@ -293,7 +249,7 @@ public partial class MainWindow{
 	private void TempoCalculatorCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
 	private void LoadInsLibCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
 	private void QuickConvertCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)=>e.CanExecute = true;
-	private void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e){
+	private async void OpenCommand_Executed(object sender, ExecutedRoutedEventArgs e){
 		OpenFileDialog fileDialog = new(){
 			AddExtension = true,
 			CheckFileExists = true,
@@ -303,10 +259,10 @@ public partial class MainWindow{
 		};
 		if(MidiPath                != null) fileDialog.FileName = MidiPath.Name;
 		if(fileDialog.ShowDialog() != true) return;
-		LoadMidi(new FileInfo(fileDialog.FileName));
+		await LoadMidi(new FileInfo(fileDialog.FileName));
 	}
 	private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
-	private void OpenMappingsCommand_Executed(object sender, ExecutedRoutedEventArgs e){
+	private async void OpenMappingsCommand_Executed(object sender, ExecutedRoutedEventArgs e){
 		OpenFileDialog fileDialog = new(){
 			AddExtension = true,
 			CheckFileExists = true,
@@ -315,7 +271,7 @@ public partial class MainWindow{
 			DefaultExt = "cfg"
 		};
 		if(fileDialog.ShowDialog() != true) return;
-		LoadMappings(new FileInfo(fileDialog.FileName));
+		await LoadMappings(new FileInfo(fileDialog.FileName));
 	}
 	private void SaveMappingsCommand_Executed(object sender, ExecutedRoutedEventArgs e){}
 	private void OpenInstrumentEditorCommand_Executed(object sender, ExecutedRoutedEventArgs e){
