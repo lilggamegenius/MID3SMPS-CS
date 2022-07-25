@@ -4,6 +4,7 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:local="clr-namespace:MID3SMPS"
+                 xmlns:userControls="clr-namespace:MID3SMPS.UserControls"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  mc:Ignorable="d"
                  Closing="OnClosing"
@@ -24,6 +25,22 @@
         <CommandBinding Command="local:WindowCommands.LoadInsLib" CanExecute="LoadInsLibCommand_CanExecute" Executed="LoadInsLibCommand_Executed" />
         <CommandBinding Command="local:WindowCommands.QuickConvert" CanExecute="QuickConvertCommand_CanExecute" Executed="QuickConvertCommand_Executed" />
     </Window.CommandBindings>
+    <Window.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style TargetType="GroupBox">
+            <Setter Property="mah:HeaderedControlHelper.HeaderFontSize" Value="8" />
+        </Style>
+        <Style TargetType="userControls:BetterTextBox">
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Right" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        </Style>
+    </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem x:Name="FileItem" Header="_File">
@@ -59,52 +76,33 @@
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Label x:Name="LoadedMidiLabel" Content="Loaded MIDI: " HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Grid.ColumnSpan="2" HorizontalContentAlignment="Center" Padding="0,0,0,0"/>
-            <TextBox x:Name="LoadedMidiTextBox" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Row="0" Grid.ColumnSpan="3" VerticalContentAlignment="Center">
-                <TextBox.Style>
-                    <Style TargetType="TextBox">
-                        <Setter Property="IsReadOnly" Value="True" />
-                        <Setter Property="BorderThickness" Value="0" />
-                        <Setter Property="TextWrapping" Value="Wrap" />
-                    </Style>
-                </TextBox.Style>
-            </TextBox>
-            <Label x:Name="LoadedBankLabel" Content="Loaded Bank: " HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Padding="0,0,0,0"/>
-            <TextBox x:Name="LoadedBankTextBox" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.ColumnSpan="3" Grid.Row="1" VerticalContentAlignment="Center">
-                <TextBox.Style>
-                    <Style TargetType="TextBox">
-                        <Setter Property="IsReadOnly" Value="True" />
-                        <Setter Property="BorderThickness" Value="0" />
-                        <Setter Property="TextWrapping" Value="Wrap" />
-                    </Style>
-                </TextBox.Style>
-            </TextBox>
-            <Label x:Name="TpQLabel" Content="Ticks/Quarter: " Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" Padding="0,0,0,0"/>
-            <TextBox x:Name="TpQTextBox" Grid.Row="3" Grid.Column="1" Margin="5,5,5,5" HorizontalAlignment="Right"/>
-            <Label x:Name="TickMulLabel" Content="Tick Multiplier: " Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0" Padding="0,0,0,0"/>
-            <TextBox x:Name="TickMulTextBox" Grid.Row="4" Grid.Column="1" Margin="5,5,5,5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalAlignment="Right"/>
-
-            <Label Content="MIDI Resolution: " Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Padding="0,0,0,0" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" />
-            <TextBox x:Name="MidiNumber" Text="420" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Row="3" HorizontalContentAlignment="Right" VerticalContentAlignment="Center">
-                <TextBox.Style>
-                    <Style TargetType="TextBox">
-                        <Setter Property="IsReadOnly" Value="True" />
-                        <Setter Property="BorderThickness" Value="0" />
-                        <Setter Property="TextWrapping" Value="Wrap" />
-                    </Style>
-                </TextBox.Style>
-            </TextBox>
-            <Button Grid.Row="6" Grid.ColumnSpan="2" Grid.Column="0" HorizontalAlignment="Center" Content="Load Ins Lib" Command="local:WindowCommands.LoadInsLib" Padding="5,5,5,5" />
-            <Button Grid.Row="6" Grid.ColumnSpan="2" HorizontalAlignment="Center" Content="Quick Convert" Command="local:WindowCommands.QuickConvert" Padding="5,5,5,5" Grid.Column="2" />
+            <GroupBox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Header="Loaded MIDI">
+                <userControls:BetterTextBox x:Name="LoadedMidiTextBox" Text="No Midi Loaded" d:Text="&lt;Midi Path.mid&gt;"/>
+            </GroupBox>
+            
+            <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Header="Loaded Bank">
+                <userControls:BetterTextBox x:Name="LoadedBankTextBox" Text="No Bank Loaded" d:Text="&lt;Bank Name.gyb&gt;"/>
+            </GroupBox>
+            
+            <GroupBox Grid.Row="2" Grid.Column="0" Header="Ticks/Quarter">
+                <userControls:BetterTextBox x:Name="TpQTextBox" Text="0" IsReadOnly="False"/>
+            </GroupBox>
+            
+            <GroupBox Grid.Row="2" Grid.Column="1" Header="MIDI Resolution">
+                <userControls:BetterTextBox x:Name="MidiNumber" Text="0" />
+            </GroupBox>
+            
+            <GroupBox Grid.Row="3" Grid.Column="0" Header="Tick Multiplier">
+                <userControls:BetterTextBox x:Name="TickMulTextBox" Text="0" IsReadOnly="False"/>
+            </GroupBox>
+            
+            <Button Grid.Row="4" Grid.Column="0" Content="Load Ins Lib" Command="local:WindowCommands.LoadInsLib" />
+            <Button Grid.Row="4" Grid.Column="1" Content="Quick Convert" Command="local:WindowCommands.QuickConvert" />
         </Grid>
     </DockPanel>
 </mah:MetroWindow>

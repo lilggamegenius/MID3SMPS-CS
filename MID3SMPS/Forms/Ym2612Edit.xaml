@@ -95,14 +95,14 @@
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="*" />
 				</Grid.ColumnDefinitions>
-                <ListView x:Name="PatchCategories" Grid.Column="0">
+                <ListView x:Name="PatchCategories" Grid.Column="0" d:ItemsSource="{d:SampleData ItemCount=5}">
                     <ListView.View>
                         <GridView AllowsColumnReorder="False">
                             <GridViewColumn Header="Patch Categories"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
-                <ListView x:Name="PatchList" Grid.Column="1" ItemsSource="{Binding Mappings.Gyb.Patches}">
+                <ListView x:Name="PatchList" Grid.Column="1" ItemsSource="{Binding Mappings.Gyb.Patches}" d:ItemsSource="{d:SampleData ItemCount=5}">
                     <ListView.View>
                         <GridView AllowsColumnReorder="False">
                             <GridViewColumn Header="Patches" DisplayMemberBinding="{Binding Name}"/>
