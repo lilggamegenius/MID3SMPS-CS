@@ -70,8 +70,8 @@
 		<Menu DockPanel.Dock="Top">
 			<MenuItem x:Name="OpenBank" Header="_Open new bank"/>
 			<MenuItem x:Name="SaveBank" Header="_Save bank"/>
-			<MenuItem x:Name="BankSwitch" Header="_Bank switch">
-				<MenuItem Header="_Melodic" IsCheckable="True" IsChecked="True"/>
+			<MenuItem x:Name="BankSwitch" Header="_Bank switch" Icon="">
+                <MenuItem Header="_Melodic" IsCheckable="True" IsChecked="True"/>
 				<MenuItem Header="_Drum" IsCheckable="True"/>
 			</MenuItem>
 			<MenuItem x:Name="ImportFile" Header="_Import from file"/>
@@ -82,13 +82,13 @@
 				<TextBlock Name="Status" Text="Ready." />
 			</StatusBarItem>
 		</StatusBar>
-		<Grid Margin="0,0,0,0">
+		<Grid Margin="0">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="10000*" MinHeight="100" />
 				<RowDefinition Height="*" MinHeight="5" />
 				<RowDefinition Height="*" MinHeight="300" />
 			</Grid.RowDefinitions>
-			<Grid Margin="0,0,0,0">
+			<Grid Margin="0">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="*" />

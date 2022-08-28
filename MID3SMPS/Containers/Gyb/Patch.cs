@@ -35,6 +35,10 @@ public struct Patch : INotifyPropertyChanged{
 			new Operator(_registers, (byte)RegisterIds.R34),
 			new Operator(_registers, (byte)RegisterIds.R3C)
 		};
+		_operators[0].PropertyChanged += PropertyChanged;
+		_operators[1].PropertyChanged += PropertyChanged;
+		_operators[2].PropertyChanged += PropertyChanged;
+		_operators[3].PropertyChanged += PropertyChanged;
 		_instrumentTransposition = 0;
 		_options = BitFieldOptions.None;
 		_chordNotes = new Chords();
@@ -65,14 +69,14 @@ public struct Patch : INotifyPropertyChanged{
 		get=>_name;
 		set{
 			_name = value;
-			OnPropertyChanged(nameof(Name));
+			OnPropertyChanged();
 		}
 	}
 	public ushort TotalSize{
 		get=>_totalSize;
 		set{
 			_totalSize = value;
-			OnPropertyChanged(nameof(TotalSize));
+			OnPropertyChanged();
 		}
 	}
 	public byte[] Registers=>_registers;
@@ -81,27 +85,30 @@ public struct Patch : INotifyPropertyChanged{
 		get=>_instrumentTransposition;
 		set{
 			_instrumentTransposition = value;
-			OnPropertyChanged(nameof(InstrumentTransposition));
+			OnPropertyChanged();
 		}
 	}
 	public BitFieldOptions Options{
 		get=>_options;
 		set{
 			_options = value;
-			OnPropertyChanged(nameof(Options));
+			OnPropertyChanged();
 		}
 	}
 	public Chords ChordNotes{
 		get=>_chordNotes;
 		set{
 			_chordNotes = value;
-			OnPropertyChanged(nameof(ChordNotes));
+			OnPropertyChanged();
 		}
 	}
 
 	private byte this[RegisterIds idx]{
 		get=>_registers[(byte)idx];
-		set=>_registers[(byte)idx] = value;
+		set{
+			_registers[(byte)idx] = value;
+			OnPropertyChanged();
+		}
 	}
 
 	[SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -179,7 +186,7 @@ public struct Operator : INotifyPropertyChanged{
 			oldVal &= 0x0F;
 			val |= oldVal;
 			_registers[_offset + (0 * 4)] = val;
-			OnPropertyChanged(nameof(Detune));
+			OnPropertyChanged();
 		}
 	}
 	public byte Multiple{ // 0x0F
@@ -195,14 +202,14 @@ public struct Operator : INotifyPropertyChanged{
 			oldVal &= 0xF0;
 			val |= oldVal;
 			_registers[_offset + (0 * 4)] = val;
-			OnPropertyChanged(nameof(Multiple));
+			OnPropertyChanged();
 		}
 	}
 	public sbyte TotalLevel{ // 0x7F
 		get=>(sbyte)(_registers[_offset + (1 * 4)] & 0x7F);
 		set{
 			_registers[_offset + (1 * 4)] = (byte)(value & 0x7F);
-			OnPropertyChanged(nameof(TotalLevel));
+			OnPropertyChanged();
 		}
 	}
 	public RateScalingModes RateScaling{ // 0xC0
@@ -218,7 +225,7 @@ public struct Operator : INotifyPropertyChanged{
 			oldVal &= 0x3F;
 			val |= oldVal;
 			_registers[_offset + (2 * 4)] = val;
-			OnPropertyChanged(nameof(RateScaling));
+			OnPropertyChanged();
 		}
 	}
 	public byte AttackRate{ // 0x3F
@@ -234,7 +241,7 @@ public struct Operator : INotifyPropertyChanged{
 			oldVal &= 0xC0;
 			val |= oldVal;
 			_registers[_offset + (2 * 4)] = val;
-			OnPropertyChanged(nameof(AttackRate));
+			OnPropertyChanged();
 		}
 	}
 	public bool AmplitudeModulation{ // 0x80
@@ -252,7 +259,7 @@ public struct Operator : INotifyPropertyChanged{
 			}
 
 			_registers[_offset + (3 * 4)] = val;
-			OnPropertyChanged(nameof(AmplitudeModulation));
+			OnPropertyChanged();
 		}
 	}
 	public byte DecayRate{ // 0x1F
@@ -264,14 +271,14 @@ public struct Operator : INotifyPropertyChanged{
 			oldVal &= 0xE0;
 			val |= oldVal;
 			_registers[_offset + (3 * 4)] = val;
-			OnPropertyChanged(nameof(DecayRate));
+			OnPropertyChanged();
 		}
 	}
 	public byte SustainRate{ // 0x1F
 		get=>(byte)(_registers[_offset + (4 * 4)] & 0x1F);
 		set{
 			_registers[_offset + (4 * 4)] = (byte)(value & 0x1F);
-			OnPropertyChanged(nameof(SustainRate));
+			OnPropertyChanged();
 		}
 	}
 	public byte SustainLevel{ // 0xF0
@@ -283,7 +290,7 @@ public struct Operator : INotifyPropertyChanged{
 			oldVal &= 0x0F;
 			val |= oldVal;
 			_registers[_offset + (5 * 4)] = val;
-			OnPropertyChanged(nameof(SustainLevel));
+			OnPropertyChanged();
 		}
 	}
 	public byte ReleaseRate{ // 0x0F
@@ -295,14 +302,14 @@ public struct Operator : INotifyPropertyChanged{
 			oldVal &= 0xF0;
 			val |= oldVal;
 			_registers[_offset + (5 * 4)] = val;
-			OnPropertyChanged(nameof(ReleaseRate));
+			OnPropertyChanged();
 		}
 	}
 	public SsgegModes SSGEG{ // 0x0F
 		get=>(SsgegModes)(_registers[_offset + (6 * 4)] & 0x0F);
 		set{
 			_registers[_offset + (6 * 4)] = (byte)((byte)value & 0x0F);
-			OnPropertyChanged(nameof(SSGEG));
+			OnPropertyChanged();
 		}
 	}
 	public event PropertyChangedEventHandler? PropertyChanged;

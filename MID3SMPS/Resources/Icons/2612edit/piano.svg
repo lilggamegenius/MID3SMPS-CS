@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" width="64px" height="64px" viewBox="0 0 64 64" version="1.1"
+     xmlns="http://www.w3.org/2000/svg">
+
+    <title>Piano</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Piano" sketch:type="MSArtboardGroup" fill="#000000">
+            <path d="M62,59 C62,60.654 60.654,62 59,62 L54,62 L54,38 L56,38 C56.55,38 57,37.55 57,37 L57,2 L59,2 C60.654,2 62,3.346 62,5 L62,59 Z M2,59 L2,5 C2,3.346 3.346,2 5,2 L11,2 L11,37 C11,37.55 11.45,38 12,38 L14,38 L14,62 L5,62 C3.346,62 2,60.654 2,59 L2,59 Z M24,2 L24,37 C24,37.55 24.45,38 25,38 L27,38 L27,62 L15,62 L15,38 L17,38 C17.55,38 18,37.55 18,37 L18,2 L24,2 Z M40,2 L40,62 L28,62 L28,38 L30,38 C30.55,38 31,37.55 31,37 L31,2 L40,2 Z M51,38 L53,38 L53,62 L41,62 L41,2 L50,2 L50,37 C50,37.55 50.45,38 51,38 L51,38 Z M59,0 L5,0 C2.239,0 0,2.239 0,5 L0,59 C0,61.761 2.239,64 5,64 L59,64 C61.761,64 64,61.761 64,59 L64,5 C64,2.239 61.761,0 59,0 L59,0 Z"
+                  sketch:type="MSShapeGroup"></path>
+        </g>
+    </g>
+</svg>

@@ -1,10 +1,12 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace MID3SMPS.Containers.Gyb;
 
-public class GYB{
+public class GYB : INotifyPropertyChanged{
 	private sbyte defaultLFOSpeed;
 	[NonSerialized] public FileInfo? Path;
 
@@ -28,14 +30,22 @@ public class GYB{
 			case var _: throw new FormatException("Not a valid GYB formatted file");
 		}
 	}
-	public List<Patch> Patches{get;} = new();
+	public sbyte DefaultLfoSpeed{
+		get=>defaultLFOSpeed;
+		set{
+			defaultLFOSpeed = value;
+			OnPropertyChanged();
+		}
+	}
+	public ObservableCollection<Patch> Patches{get;} = new();
+	public event PropertyChangedEventHandler? PropertyChanged;
 
 	private void LoadV1(Span<byte> gybData){}
 
-	private void LoadV2(Span<byte> gybData){defaultLFOSpeed = (sbyte)gybData[105];}
+	private void LoadV2(Span<byte> gybData){DefaultLfoSpeed = (sbyte)gybData[105];}
 
 	private void LoadV3(Span<byte> gybData){
-		defaultLFOSpeed = (sbyte)gybData[3];
+		DefaultLfoSpeed = (sbyte)gybData[3];
 		uint filesize = BitConverter.ToUInt32(gybData[0x4..]);
 		if(filesize != gybData.Length) throw new FormatException("Not a valid GYB formatted file");
 		uint bankOffset = BitConverter.ToUInt32(gybData[0x8..]);
@@ -51,6 +61,7 @@ public class GYB{
 			currentOffset += instrumentSize;
 		}
 	}
+	protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null){PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));}
 }
 
 /*

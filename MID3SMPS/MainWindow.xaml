@@ -10,7 +10,7 @@
                  Closing="OnClosing"
                  Loaded="MainWindowLoaded"
                  Icon="/MID3SMPS;component/Resources/Icons/mid3smps.ico"
-                 Title="MID --> SMPS" Height="320" Width="320" MinHeight="250" MinWidth="260">
+                 Title="MID --> SMPS" Height="320" Width="320" MinHeight="250" MinWidth="300">
     <Window.DataContext>
         <Binding RelativeSource="{RelativeSource Self}" />
     </Window.DataContext>
@@ -69,7 +69,7 @@
                 <TextBlock Name="Status" Text="Ready." />
             </StatusBarItem>
         </StatusBar>
-        <Grid ScrollViewer.CanContentScroll="True" Margin="5">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
